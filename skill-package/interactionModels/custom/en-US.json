@@ -88,9 +88,6 @@
           "samples": [
             "emergency",
             "this is an emergency",
-            "call my family",
-            "call my son",
-            "call my daughter",
             "I need real help"
           ]
         },
@@ -162,6 +159,63 @@
             "create reminders",
             "remind me about pills",
             "turn on reminders"
+          ]
+        },
+        {
+          "name": "LlamaContactoIntent",
+          "slots": [
+            {
+              "name": "contactName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "call {contactName}",
+            "call my son",
+            "I want to talk to {contactName}",
+            "talk to {contactName}"
+          ]
+        },
+        {
+          "name": "AnadirContactoIntent",
+          "slots": [
+            {
+              "name": "contactName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "add {contactName}",
+            "add contact {contactName}",
+            "my son is {contactName}"
+          ]
+        },
+        {
+          "name": "ConstantesIntent",
+          "slots": [],
+          "samples": [
+            "vitals",
+            "pulse",
+            "how is my pulse",
+            "watch reading"
+          ]
+        },
+        {
+          "name": "RegistrarPulsoIntent",
+          "slots": [
+            {
+              "name": "heartRate",
+              "type": "AMAZON.NUMBER"
+            },
+            {
+              "name": "spo2",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "pulse {heartRate}",
+            "heart rate {heartRate}",
+            "pulse {heartRate} oxygen {spo2}"
           ]
         },
         {

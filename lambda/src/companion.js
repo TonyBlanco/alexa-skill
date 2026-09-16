@@ -2,7 +2,9 @@
 
 const { clock, dayPart, isMorningMedsWindow, isEveningMedsWindow } = require('./time');
 const { dayState, writeDay, withNames, mergeProfile } = require('./profile');
-const { localeBundle, wrapSpeak, medsLabel, companyLine } = require('./speech');
+const { localeBundle, wrapSpeak, medsLabel, companyLine, vitalsParts } = require('./speech');
+const { addContact, findContact } = require('./contacts');
+const { recordVitals, vitalsAgeHours, unusualHeartRate } = require('./vitals');
 
 const INTENTS = {
   LAUNCH: 'Launch',
@@ -26,6 +28,10 @@ const INTENTS = {
   YES: 'Yes',
   NO: 'No',
   FALLBACK: 'Fallback',
+  CALL: 'Call',
+  ADD_CONTACT: 'AddContact',
+  VITALS: 'Vitals',
+  RECORD_VITALS: 'RecordVitals',
 };
 
 function medsStillOpen(status) {
@@ -232,6 +238,11 @@ function handleTurn({
       const text = copy.setupDone(profile.personName, profile.caregiverName);
       return { profile, lastSpeech: text, ...say(copy, text, null) };
     }
+    if (pending === 'add-contact') {
+      profile = addContact(profile, name);
+      const text = copy.contactAdded(name);
+      return { profile, lastSpeech: text, ...say(copy, text, null) };
+    }
     profile = withNames(profile, { personName: name });
     const text = copy.setupAskCaregiver(profile.personName);
     return { profile, lastSpeech: text, ...say(copy, text, 'setup-caregiver') };
@@ -304,6 +315,54 @@ function handleTurn({
       return { profile, lastSpeech: text, ...say(copy, text, 'meds') };
     }
     return { profile, lastSpeech: copy.whatsNextRest, ...say(copy, copy.whatsNextRest, null) };
+  }
+
+  if (resolved === INTENTS.ADD_CONTACT) {
+    const name = slots.contactName || slots.personName || slots.name;
+    if (!name) {
+      return { profile, lastSpeech: copy.contactNeedName, ...say(copy, copy.contactNeedName, 'add-contact') };
+    }
+    profile = addContact(profile, name, slots.relation || 'familia');
+    const text = copy.contactAdded(name);
+    return { profile, lastSpeech: text, ...say(copy, text, null) };
+  }
+
+  if (resolved === INTENTS.CALL) {
+    const spoken = slots.contactName || slots.personName || slots.name;
+    const contact = findContact(profile, spoken);
+    if (!contact) {
+      const text = copy.callUnknown(spoken);
+      return { profile, lastSpeech: text, ...say(copy, text, null) };
+    }
+    const text = copy.callKnown(contact.name);
+    return { profile, lastSpeech: text, ...say(copy, text, null) };
+  }
+
+  if (resolved === INTENTS.RECORD_VITALS) {
+    const heartRate = slots.heartRate;
+    if (heartRate == null || heartRate === '') {
+      return { profile, lastSpeech: copy.vitalsNeedNumber, ...say(copy, copy.vitalsNeedNumber, null) };
+    }
+    profile = recordVitals(
+      profile,
+      { heartRate, spo2: slots.spo2, systolic: slots.systolic, diastolic: slots.diastolic, source: 'voice' },
+      now,
+    );
+    let text = copy.vitalsRecorded(vitalsParts(profile.vitals, locale));
+    if (unusualHeartRate(profile.vitals.heartRate)) {
+      text += copy.vitalsUnusual;
+    }
+    return { profile, lastSpeech: text, ...say(copy, text, null) };
+  }
+
+  if (resolved === INTENTS.VITALS) {
+    if (!profile.vitals || !vitalsParts(profile.vitals, locale)) {
+      return { profile, lastSpeech: copy.vitalsNone, ...say(copy, copy.vitalsNone, null) };
+    }
+    const age = vitalsAgeHours(profile.vitals, now);
+    const stale = age != null && age > 12;
+    const text = copy.vitalsRead(vitalsParts(profile.vitals, locale), stale);
+    return { profile, lastSpeech: text, ...say(copy, text, null) };
   }
 
   if (resolved === INTENTS.LAUNCH) {

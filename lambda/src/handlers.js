@@ -252,6 +252,61 @@ const RecordatoriosIntentHandler = {
   },
 };
 
+const LlamaContactoIntentHandler = {
+  canHandle(handlerInput) {
+    return (
+      Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === 'LlamaContactoIntent'
+    );
+  },
+  handle(handlerInput) {
+    return run(handlerInput, INTENTS.CALL, {
+      contactName: slotValue(handlerInput, 'contactName'),
+    });
+  },
+};
+
+const AnadirContactoIntentHandler = {
+  canHandle(handlerInput) {
+    return (
+      Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === 'AnadirContactoIntent'
+    );
+  },
+  handle(handlerInput) {
+    return run(handlerInput, INTENTS.ADD_CONTACT, {
+      contactName: slotValue(handlerInput, 'contactName'),
+    });
+  },
+};
+
+const ConstantesIntentHandler = {
+  canHandle(handlerInput) {
+    return (
+      Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === 'ConstantesIntent'
+    );
+  },
+  handle(handlerInput) {
+    return run(handlerInput, INTENTS.VITALS);
+  },
+};
+
+const RegistrarPulsoIntentHandler = {
+  canHandle(handlerInput) {
+    return (
+      Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === 'RegistrarPulsoIntent'
+    );
+  },
+  handle(handlerInput) {
+    return run(handlerInput, INTENTS.RECORD_VITALS, {
+      heartRate: slotValue(handlerInput, 'heartRate'),
+      spo2: slotValue(handlerInput, 'spo2'),
+    });
+  },
+};
+
 const YesIntentHandler = {
   canHandle(handlerInput) {
     return (
@@ -438,6 +493,10 @@ const requestHandlers = [
   ConfigurarIntentHandler,
   NombreIntentHandler,
   RecordatoriosIntentHandler,
+  LlamaContactoIntentHandler,
+  AnadirContactoIntentHandler,
+  ConstantesIntentHandler,
+  RegistrarPulsoIntentHandler,
   YesIntentHandler,
   NoIntentHandler,
   HelpIntentHandler,

@@ -111,9 +111,6 @@
             "emergencia",
             "es una emergencia",
             "necesito ayuda de verdad",
-            "llama a mi hijo",
-            "llama a mi hija",
-            "llama a mi familia",
             "socorro",
             "ayúdame ahora"
           ]
@@ -196,6 +193,71 @@
             "recuérdame las pastillas",
             "activa los avisos",
             "pon avisos"
+          ]
+        },
+        {
+          "name": "LlamaContactoIntent",
+          "slots": [
+            {
+              "name": "contactName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "llama a {contactName}",
+            "llama {contactName}",
+            "quiero hablar con {contactName}",
+            "habla con {contactName}",
+            "llama a mi hijo",
+            "llama a mi hija",
+            "llama a la familia"
+          ]
+        },
+        {
+          "name": "AnadirContactoIntent",
+          "slots": [
+            {
+              "name": "contactName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "añade a {contactName}",
+            "añade contacto {contactName}",
+            "el hijo se llama {contactName}",
+            "la hija se llama {contactName}",
+            "apunta a {contactName}"
+          ]
+        },
+        {
+          "name": "ConstantesIntent",
+          "slots": [],
+          "samples": [
+            "constantes",
+            "el pulso",
+            "cómo está el pulso",
+            "cómo está el reloj",
+            "tensión",
+            "oxígeno"
+          ]
+        },
+        {
+          "name": "RegistrarPulsoIntent",
+          "slots": [
+            {
+              "name": "heartRate",
+              "type": "AMAZON.NUMBER"
+            },
+            {
+              "name": "spo2",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "pulso {heartRate}",
+            "el pulso es {heartRate}",
+            "pulso {heartRate} oxígeno {spo2}",
+            "anota pulso {heartRate}"
           ]
         },
         {

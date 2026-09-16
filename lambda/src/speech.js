@@ -52,7 +52,7 @@ const COPY = {
     setupAskCaregiver: (person) =>
       `De acuerdo, ${person}. ¿Y tú, que cuidas, cómo te llamas? Di: yo me llamo, y tu nombre.`,
     setupDone: (person, caregiver) =>
-      `Listo. Este altavoz es el compañero de ${person}${caregiver ? `, y el cuidador es ${caregiver}` : ''}. ${person} solo tiene que decir: estoy bien, pastillas, háblame, o ayuda. Si quieres avisos, di: pon los recordatorios.`,
+      `Listo. Este altavoz es el compañero de ${person}${caregiver ? `, y el cuidador es ${caregiver}` : ''}. ${person} puede decir: estoy bien, pastillas, háblame, llama y un nombre, o constantes. Si quieres avisos, di: pon los recordatorios. Para hablar de verdad, guarda a la familia en contactos de Alexa una vez.`,
     setupNeedName: 'No he pillado el nombre. Di: se llama Ana. Un solo nombre vale.',
     remindersAsk:
       'Voy a pedirte permiso para recordatorios de Alexa. Tú, el cuidador, di que sí. Luego el mayor solo oirá el aviso y dirá: Alexa, abre compañero diario.',
@@ -63,9 +63,26 @@ const COPY = {
     remindersCreated: 'Recordatorios diarios listos: mañana y noche. Di adiós, o prueba: estoy bien.',
     remindersFailed:
       'No he podido crear los recordatorios ahora. La skill sigue valiendo: ábrela a mano. Inténtalo más tarde con: pon los recordatorios.',
-    help: 'Puedes decir: estoy bien, pastillas, háblame, o emergencia. Para parar, di adiós. ¿Qué quieres?',
-    helpShort: 'Di: estoy bien, pastillas, háblame, o ayuda.',
-    fallback: 'No te he entendido. Di: estoy bien, pastillas, háblame, o emergencia.',
+    help: 'Puedes decir: estoy bien, pastillas, háblame, llama Miguel, constantes, o emergencia. Para parar, di adiós. ¿Qué quieres?',
+    helpShort: 'Di: estoy bien, pastillas, háblame, llama y un nombre, o constantes.',
+    fallback: 'No te he entendido. Di: estoy bien, pastillas, háblame, llama y un nombre, o emergencia.',
+    callKnown: (name) =>
+      `Para hablar con ${name} la llamada la hace Alexa, no yo. Di adiós, y luego despacio: Alexa, llama a ${name}. El cuidador tiene que haber guardado a ${name} en contactos de Alexa una vez.`,
+    callUnknown: (name) =>
+      name
+        ? `No tengo a ${name} apuntado. El cuidador puede decir: añade a ${name}. Mientras, prueba: Alexa, llama a ${name}.`
+        : '¿A quién llamo? Di: llama Miguel.',
+    callNeedName: 'Di el nombre. Por ejemplo: llama Miguel.',
+    contactAdded: (name) =>
+      `He apuntado a ${name}. En la app de Alexa, el cuidador también lo guarda como contacto de llamada una vez. Luego el mayor dice: llama ${name}.`,
+    contactNeedName: 'No he pillado el nombre. Di: añade a Miguel.',
+    vitalsNone:
+      'Todavía no tengo constantes del reloj. No es un dato médico. El cuidador puede decir: pulso, y el número. O, más adelante, el reloj las sube solo.',
+    vitalsRead: (parts, stale) =>
+      `${stale ? 'Tengo un dato antiguo. ' : ''}Último dato: ${parts}. No es un diagnóstico. Si te encuentras mal, di llama y el nombre, o emergencia.`,
+    vitalsRecorded: (parts) => `Dejo apuntado ${parts}. No es un dato médico. Di constantes cuando quieras oírlas.`,
+    vitalsNeedNumber: 'Dime el pulso con un número. Por ejemplo: pulso setenta y dos.',
+    vitalsUnusual: ' Ese pulso está fuera de lo habitual en reposo. Si te encuentras mal, di llama y el nombre.',
     goodbye: 'Hasta luego. Aquí sigo.',
     stop: 'Vale. Hasta luego.',
     yesUnclear: 'Dime con palabras: estoy bien, pastillas, o háblame.',
@@ -120,7 +137,7 @@ const COPY = {
     setupAskPerson: 'Okay. What is the name of the person who will use this speaker? Say: their name is, then the name.',
     setupAskCaregiver: (person) => `Got it, ${person}. And your name, the caregiver? Say: my name is, then your name.`,
     setupDone: (person, caregiver) =>
-      `Done. This speaker is ${person}'s companion${caregiver ? `, and the caregiver is ${caregiver}` : ''}. ${person} can say: I am okay, pills, talk to me, or help. For alerts, say: set the reminders.`,
+      `Done. This speaker is ${person}'s companion${caregiver ? `, and the caregiver is ${caregiver}` : ''}. ${person} can say: I am okay, pills, talk to me, call and a name, or vitals. For alerts, say: set the reminders. For a real call, save family in Alexa contacts once.`,
     setupNeedName: 'I missed the name. Say: their name is Ana. One first name is enough.',
     remindersAsk:
       'I will ask you, the caregiver, for Alexa reminder permission. Say yes. Then the older adult only hears the chime and says: Alexa, open daily companion.',
@@ -129,14 +146,31 @@ const COPY = {
       'Without permission I cannot create Alexa reminders. They can still say: Alexa, open daily companion. Say set the reminders if you change your mind.',
     remindersCreated: 'Daily reminders are set: morning and night. Say goodbye, or try: I am okay.',
     remindersFailed: 'I could not create reminders right now. Open the skill by voice. Try set the reminders later.',
-    help: 'You can say: I am okay, pills, talk to me, or emergency. To stop, say goodbye. What do you need?',
-    helpShort: 'Say: I am okay, pills, talk to me, or help.',
-    fallback: 'I did not catch that. Say: I am okay, pills, talk to me, or emergency.',
+    help: 'You can say: I am okay, pills, talk to me, call Miguel, vitals, or emergency. To stop, say goodbye. What do you need?',
+    helpShort: 'Say: I am okay, pills, talk to me, call and a name, or vitals.',
+    fallback: 'I did not catch that. Say: I am okay, pills, talk to me, call and a name, or emergency.',
     goodbye: 'See you later. I will be here.',
     stop: 'Okay. See you later.',
     yesUnclear: 'Please use words: I am okay, pills, or talk to me.',
     noUnclear: 'Okay. Say I am okay, pills, talk to me, or goodbye.',
     error: 'Sorry, I got confused. Try: I am okay, or talk to me.',
+    callKnown: (name) =>
+      `To talk to ${name}, Alexa places the call, not me. Say goodbye, then slowly: Alexa, call ${name}. The caregiver must save ${name} in Alexa contacts once.`,
+    callUnknown: (name) =>
+      name
+        ? `I do not have ${name} saved. The caregiver can say: add ${name}. Meanwhile try: Alexa, call ${name}.`
+        : 'Who should I call? Say: call Miguel.',
+    callNeedName: 'Say the name. For example: call Miguel.',
+    contactAdded: (name) =>
+      `I saved ${name}. In the Alexa app, the caregiver also adds them as a calling contact once. Then they can say: call ${name}.`,
+    contactNeedName: 'I missed the name. Say: add Miguel.',
+    vitalsNone:
+      'I do not have watch readings yet. This is not medical data. The caregiver can say: pulse, then the number. Later the watch can upload them.',
+    vitalsRead: (parts, stale) =>
+      `${stale ? 'This reading is old. ' : ''}Last reading: ${parts}. Not a diagnosis. If you feel unwell, say call and the name, or emergency.`,
+    vitalsRecorded: (parts) => `Noted ${parts}. Not medical data. Say vitals when you want to hear them.`,
+    vitalsNeedNumber: 'Say the pulse with a number. For example: pulse seventy two.',
+    vitalsUnusual: ' That pulse is outside a typical resting range. If you feel unwell, say call and the name.',
   },
 };
 
@@ -168,10 +202,22 @@ function companyLine(copy, isoDay, hour) {
   return lines[index];
 }
 
+function vitalsParts(vitals, locale = 'es-ES') {
+  const es = !(locale && locale.toLowerCase().startsWith('en'));
+  const bits = [];
+  if (vitals?.heartRate != null) bits.push(es ? `pulso ${vitals.heartRate}` : `pulse ${vitals.heartRate}`);
+  if (vitals?.spo2 != null) bits.push(es ? `oxígeno ${vitals.spo2}` : `oxygen ${vitals.spo2}`);
+  if (vitals?.systolic != null && vitals?.diastolic != null) {
+    bits.push(es ? `tensión ${vitals.systolic} ${vitals.diastolic}` : `blood pressure ${vitals.systolic} over ${vitals.diastolic}`);
+  }
+  return bits.join(', ');
+}
+
 module.exports = {
   COPY,
   localeBundle,
   wrapSpeak,
   medsLabel,
   companyLine,
+  vitalsParts,
 };

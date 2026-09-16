@@ -12,6 +12,9 @@ Producto e investigación: el plan vive fuera de este repo en el Agent Store del
 - Pastillas: pregunta si se las tomó; «no me acuerdo» **no** marca la toma
 - Compañía: textos cortos originales
 - Emergencia: se queda con la persona y recuerda `Alexa, llama a…`. **No llama al 112**
+- «llama Miguel»: dicta la llamada nativa; el cuidador guarda el contacto en Alexa una vez
+- Constantes: lee el último pulso guardado; **no** es un dato médico
+- Configuración por voz: «configura», «añade a Miguel»
 - Configuración por voz: «configura»
 - Recordatorios ASK opcionales (el cuidador dice que sí al permiso)
 
@@ -35,9 +38,9 @@ Persistencia DynamoDB: opcional, variable `COMPANERO_TABLE`. Sin ella, el perfil
 
 ## Frases
 
-Mayor: `estoy bien` · `pastillas` · `háblame` · `emergencia` · `repite` · `adiós`
+Mayor: `estoy bien` · `pastillas` · `háblame` · `llama Miguel` · `constantes` · `emergencia`
 
-Cuidador (una vez): `configura` · `pon los recordatorios`
+Cuidador (una vez): `configura` · `añade a Miguel` · `pon los recordatorios` · `pulso 72` (apaño si mira el reloj)
 
 ## Requisitos
 

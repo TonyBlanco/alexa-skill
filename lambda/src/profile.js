@@ -21,6 +21,8 @@ function defaultProfile() {
     setupComplete: false,
     remindersGranted: false,
     meds: defaultMeds(),
+    contacts: [],
+    vitals: null,
     days: {},
   };
 }
@@ -34,6 +36,8 @@ function mergeProfile(stored) {
     ...base,
     ...stored,
     meds: Array.isArray(stored.meds) && stored.meds.length ? stored.meds : base.meds,
+    contacts: Array.isArray(stored.contacts) ? stored.contacts : [],
+    vitals: stored.vitals && typeof stored.vitals === 'object' ? stored.vitals : null,
     days: stored.days && typeof stored.days === 'object' ? stored.days : {},
   };
 }
