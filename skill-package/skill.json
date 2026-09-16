@@ -3,7 +3,7 @@
     "publishingInformation": {
       "locales": {
         "es-ES": {
-          "summary": "Compañero de mesilla para personas mayores: check-in, pastillas, compañía y aviso al cuidador.",
+          "summary": "Compañero de mesilla para personas mayores: check-in, pastillas y compañía. El cuidador configura una vez.",
           "examplePhrases": [
             "Alexa, abre compañero diario",
             "Alexa, abre compañero diario y dime que estoy bien",

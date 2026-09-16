@@ -28,12 +28,14 @@ const INTENTS = {
   FALLBACK: 'Fallback',
 };
 
+function medsStillOpen(status) {
+  return status !== 'taken' && status !== 'unsure';
+}
+
 function dueMedsId(profile, isoDay, hour) {
   const state = dayState(profile, isoDay);
-  const morningDone = Boolean(state.meds.manana);
-  const eveningDone = Boolean(state.meds.noche);
-  if (isMorningMedsWindow(hour) && !morningDone) return 'manana';
-  if (isEveningMedsWindow(hour) && !eveningDone) return 'noche';
+  if (isMorningMedsWindow(hour) && medsStillOpen(state.meds.manana)) return 'manana';
+  if (isEveningMedsWindow(hour) && medsStillOpen(state.meds.noche)) return 'noche';
   return null;
 }
 
@@ -53,10 +55,16 @@ function nextFocus(profile, now = new Date()) {
   const { isoDay, hour, timeZone } = clock(now, profile.timeZone);
   const medsId = dueMedsId(profile, isoDay, hour);
   const checkIn = neededCheckIn(isoDay, hour, profile);
+  const morningGreeting = checkIn === 'morning' && hour < 9;
+  const eveningGreeting = checkIn === 'evening' && hour >= 18 && hour < 20;
   let focus = 'rest';
-  if (checkIn && (hour < 12 || hour >= 18)) focus = 'checkin';
-  else if (medsId) focus = 'meds';
-  else if (checkIn) focus = 'checkin';
+  if (morningGreeting || eveningGreeting) {
+    focus = 'checkin';
+  } else if (medsId) {
+    focus = 'meds';
+  } else if (checkIn) {
+    focus = 'checkin';
+  }
   return { isoDay, hour, timeZone, medsId, checkIn, focus, part: dayPart(hour) };
 }
 
@@ -175,13 +183,38 @@ function handleTurn({
   }
 
   if (resolved === INTENTS.CONFIGURE) {
-    if (slots.personName && slots.caregiverName) {
+    const personSlot = slots.personName;
+    const caregiverSlot = slots.caregiverName;
+    if (pending === 'setup-caregiver') {
+      const name = caregiverSlot || personSlot;
+      if (!name) {
+        return { profile, lastSpeech: copy.setupNeedName, ...say(copy, copy.setupNeedName, 'setup-caregiver') };
+      }
+      profile = withNames(profile, { caregiverName: name });
+      const text = copy.setupDone(profile.personName, profile.caregiverName);
+      return { profile, lastSpeech: text, ...say(copy, text, null) };
+    }
+    if (pending === 'setup-person') {
+      const name = personSlot || caregiverSlot;
+      if (!name) {
+        return { profile, lastSpeech: copy.setupNeedName, ...say(copy, copy.setupNeedName, 'setup-person') };
+      }
+      profile = withNames(profile, { personName: name });
+      const text = copy.setupAskCaregiver(profile.personName);
+      return { profile, lastSpeech: text, ...say(copy, text, 'setup-caregiver') };
+    }
+    if (personSlot && caregiverSlot) {
       profile = withNames(profile, slots);
       const text = copy.setupDone(profile.personName, profile.caregiverName);
       return { profile, lastSpeech: text, ...say(copy, text, null) };
     }
-    if (slots.personName) {
-      profile = withNames(profile, { personName: slots.personName });
+    if (caregiverSlot && profile.personName) {
+      profile = withNames(profile, { caregiverName: caregiverSlot });
+      const text = copy.setupDone(profile.personName, profile.caregiverName);
+      return { profile, lastSpeech: text, ...say(copy, text, null) };
+    }
+    if (personSlot) {
+      profile = withNames(profile, { personName: personSlot });
       const text = copy.setupAskCaregiver(profile.personName);
       return { profile, lastSpeech: text, ...say(copy, text, 'setup-caregiver') };
     }
@@ -228,8 +261,7 @@ function handleTurn({
     const status = resolved === INTENTS.CHECKIN_WELL ? 'well' : 'unwell';
     profile = recordCheckIn(profile, snapshot.isoDay, which, status);
     const text = status === 'well' ? copy.checkInWell(profile.personName) : copy.checkInUnwell;
-    const nextPending = dueMedsId(profile, snapshot.isoDay, snapshot.hour) ? 'meds' : null;
-    return { profile, lastSpeech: text, ...say(copy, text, nextPending) };
+    return { profile, lastSpeech: text, ...say(copy, text, null) };
   }
 
   if (

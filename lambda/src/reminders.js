@@ -1,5 +1,7 @@
 'use strict';
 
+const { clock } = require('./time');
+
 const REMINDER_SCOPE = 'alexa::alerts:reminders:skill:readwrite';
 
 function askForRemindersDirective() {
@@ -38,8 +40,16 @@ function reminderBody({ scheduledTime, timeZoneId, text, locale }) {
   };
 }
 
-function scheduledTimeForHour(hour) {
-  return `2020-01-01T${String(hour).padStart(2, '0')}:00:00`;
+function addCalendarDays(isoDay, days) {
+  const [year, month, day] = isoDay.split('-').map(Number);
+  const utc = new Date(Date.UTC(year, month - 1, day + days));
+  return utc.toISOString().slice(0, 10);
+}
+
+function scheduledTimeForHour(hour, now = new Date(), timeZone = 'Europe/Madrid') {
+  const { isoDay, hour: currentHour } = clock(now, timeZone);
+  const day = currentHour >= hour ? addCalendarDays(isoDay, 1) : isoDay;
+  return `${day}T${String(hour).padStart(2, '0')}:00:00`;
 }
 
 /**
@@ -60,13 +70,13 @@ async function createDailyReminders(handlerInput, { timeZone = 'Europe/Madrid', 
 
   const payloads = [
     reminderBody({
-      scheduledTime: scheduledTimeForHour(9),
+      scheduledTime: scheduledTimeForHour(9, new Date(), timeZone),
       timeZoneId: timeZone,
       text: open,
       locale,
     }),
     reminderBody({
-      scheduledTime: scheduledTimeForHour(21),
+      scheduledTime: scheduledTimeForHour(21, new Date(), timeZone),
       timeZoneId: timeZone,
       text: open,
       locale,
@@ -96,4 +106,5 @@ module.exports = {
   createDailyReminders,
   remindersPermissionStatus,
   reminderBody,
+  scheduledTimeForHour,
 };

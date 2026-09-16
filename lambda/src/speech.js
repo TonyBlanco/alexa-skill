@@ -148,7 +148,10 @@ function localeBundle(locale) {
 }
 
 function wrapSpeak(text, { slow = true } = {}) {
-  const safe = String(text).replace(/&/g, 'y');
+  const safe = String(text)
+    .replace(/&/g, 'y')
+    .replace(/</g, '')
+    .replace(/>/g, '');
   if (!slow) {
     return `<speak>${safe}</speak>`;
   }
