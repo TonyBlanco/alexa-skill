@@ -53,42 +53,56 @@ function scheduledTimeForHour(hour, now = new Date(), timeZone = 'Europe/Madrid'
 }
 
 /**
- * Recurring daily reminders that tell the elder to reopen the skill.
- * scheduledTime date is a placeholder; Alexa uses the time + DAILY recurrence.
+ * Native Alexa reminders that still speak if the skill session dies.
+ * They name the real task (meal, pills, walk), not only "open the skill".
  */
-async function createDailyReminders(handlerInput, { timeZone = 'Europe/Madrid', locale = 'es-ES' } = {}) {
+function dailyReminderSpecs({ locale = 'es-ES', personName = 'Luis' } = {}) {
+  const name = personName || 'Luis';
+  const english = locale && locale.toLowerCase().startsWith('en');
+  if (english) {
+    return [
+      { hour: 8, text: `${name}, time for breakfast.` },
+      { hour: 9, text: `${name}, time for the morning pills.` },
+      { hour: 11, text: `${name}, time to move a little. A gentle walk.` },
+      { hour: 14, text: `${name}, time for lunch.` },
+      { hour: 21, text: `${name}, time for the evening pills.` },
+    ];
+  }
+  return [
+    { hour: 8, text: `${name}, hora del desayuno.` },
+    { hour: 9, text: `${name}, hora de las pastillas de la mañana.` },
+    { hour: 11, text: `${name}, hora de moverte un poco. Un paseo suave.` },
+    { hour: 14, text: `${name}, hora de la comida.` },
+    { hour: 21, text: `${name}, hora de las pastillas de la noche.` },
+  ];
+}
+
+async function createDailyReminders(
+  handlerInput,
+  { timeZone = 'Europe/Madrid', locale = 'es-ES', personName = 'Luis' } = {},
+) {
   const factory = handlerInput.serviceClientFactory;
   if (!factory || typeof factory.getReminderManagementServiceClient !== 'function') {
     return { ok: false, reason: 'no-client' };
   }
 
   const client = factory.getReminderManagementServiceClient();
-  const open =
-    locale && locale.toLowerCase().startsWith('en')
-      ? 'Time for your companion. Say: Alexa, open daily companion.'
-      : 'Hora de tu compañero. Di: Alexa, abre compañero diario.';
-
-  const payloads = [
+  const specs = dailyReminderSpecs({ locale, personName });
+  const payloads = specs.map((spec) =>
     reminderBody({
-      scheduledTime: scheduledTimeForHour(9, new Date(), timeZone),
+      scheduledTime: scheduledTimeForHour(spec.hour, new Date(), timeZone),
       timeZoneId: timeZone,
-      text: open,
+      text: spec.text,
       locale,
     }),
-    reminderBody({
-      scheduledTime: scheduledTimeForHour(21, new Date(), timeZone),
-      timeZoneId: timeZone,
-      text: open,
-      locale,
-    }),
-  ];
+  );
 
   try {
     for (const body of payloads) {
       // eslint-disable-next-line no-await-in-loop
       await client.createReminder(body);
     }
-    return { ok: true };
+    return { ok: true, count: payloads.length };
   } catch (error) {
     console.error('createDailyReminders failed', error);
     return { ok: false, reason: error.message };
@@ -104,6 +118,7 @@ module.exports = {
   REMINDER_SCOPE,
   askForRemindersDirective,
   createDailyReminders,
+  dailyReminderSpecs,
   remindersPermissionStatus,
   reminderBody,
   scheduledTimeForHour,

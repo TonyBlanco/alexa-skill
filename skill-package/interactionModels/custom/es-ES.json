@@ -90,6 +90,86 @@
           ]
         },
         {
+          "name": "ComidaIntent",
+          "slots": [],
+          "samples": [
+            "comida",
+            "desayuno",
+            "cena",
+            "la comida",
+            "el desayuno",
+            "hora de comer",
+            "qué hay de comer",
+            "tengo hambre"
+          ]
+        },
+        {
+          "name": "ComidaHechaIntent",
+          "slots": [],
+          "samples": [
+            "ya comí",
+            "ya he comido",
+            "ya desayuné",
+            "ya cené",
+            "ya tomé el desayuno"
+          ]
+        },
+        {
+          "name": "ComidaPendienteIntent",
+          "slots": [],
+          "samples": [
+            "todavía no he comido",
+            "aún no he comido",
+            "no he comido",
+            "no he desayunado",
+            "luego como"
+          ]
+        },
+        {
+          "name": "CaminarIntent",
+          "slots": [],
+          "samples": [
+            "caminar",
+            "paseo",
+            "el paseo",
+            "moverme",
+            "hora de caminar",
+            "un paseo suave"
+          ]
+        },
+        {
+          "name": "CaminarHechoIntent",
+          "slots": [],
+          "samples": [
+            "ya me he movido",
+            "ya me moví",
+            "ya paseé",
+            "ya di un paseo",
+            "ya caminé"
+          ]
+        },
+        {
+          "name": "CaminarPendienteIntent",
+          "slots": [],
+          "samples": [
+            "todavía no he caminado",
+            "aún no he salido",
+            "no he paseado",
+            "luego camino"
+          ]
+        },
+        {
+          "name": "QueHoraEsIntent",
+          "slots": [],
+          "samples": [
+            "qué hora es",
+            "qué hora",
+            "dime la hora",
+            "la hora",
+            "qué horas son"
+          ]
+        },
+        {
           "name": "CompaniaIntent",
           "slots": [],
           "samples": [
@@ -192,7 +272,9 @@
             "crea los recordatorios",
             "recuérdame las pastillas",
             "activa los avisos",
-            "pon avisos"
+            "pon avisos",
+            "recuérdame comer",
+            "recuérdame caminar"
           ]
         },
         {

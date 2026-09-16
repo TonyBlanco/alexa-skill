@@ -5,22 +5,29 @@ const COPY = {
     invocation: 'compañero diario',
     medsMorning: 'las pastillas de la mañana',
     medsEvening: 'las pastillas de la noche',
+    mealBreakfast: 'el desayuno',
+    mealLunch: 'la comida',
+    mealDinner: 'la cena',
     launchNew:
-      'Hola. Soy tu compañero diario. Si estás configurando esto para alguien, di configura. Si ya vives conmigo, di estoy bien, o háblame.',
+      'Hola, Luis. Soy tu compañero diario. Di: comida, pastillas, caminar, qué hora es, o háblame.',
     launchMorning: (name) =>
       `Hola${name ? `, ${name}` : ''}. ¿Cómo estás esta mañana? Di: estoy bien.`,
     launchAfternoonOk: (name) =>
-      `Hola${name ? `, ${name}` : ''}. Hoy ya me dijiste que estás bien. Si quieres, dime háblame. O pastillas, si toca.`,
+      `Hola${name ? `, ${name}` : ''}. Hoy ya me dijiste que estás bien. Si quieres, dime háblame, qué hora es, o caminar.`,
     launchNeedMeds: (name, medsLabel) =>
       `Hola${name ? `, ${name}` : ''}. ¿Te tomaste ${medsLabel}? Di: me las tomé, todavía no, o no me acuerdo.`,
+    launchNeedMeal: (name, meal) =>
+      `Hola${name ? `, ${name}` : ''}. ¿Ya tomaste ${meal}? Di: ya comí, o todavía no.`,
+    launchNeedWalk: (name) =>
+      `Hola${name ? `, ${name}` : ''}. ¿Has dado un paseo suave o te has movido un poco? Di: ya me he movido, o todavía no.`,
     launchEvening: (name) =>
       `Buenas noches${name ? `, ${name}` : ''}. ¿Cómo te encuentras? Di: estoy bien, o háblame.`,
     launchNight: (name) =>
       `Estoy aquí${name ? `, ${name}` : ''}. Si quieres compañía, di háblame. Si necesitas ayuda de verdad, di emergencia.`,
     checkInWell: (name) =>
-      `Me alegra${name ? `, ${name}` : ''}. Si tocan pastillas, di pastillas. Si quieres compañía, di háblame.`,
+      `Me alegra${name ? `, ${name}` : ''}. Si toca comer, di comida. Si tocan pastillas, di pastillas. Si quieres compañía, di háblame.`,
     checkInUnwell:
-      'Siento que no estés bien. Puedo quedarme un rato: di háblame. Si es urgente, di emergencia.',
+      'Siento que no estés bien. Puedo quedarme un rato: di háblame. Si es urgente, di emergencia. Yo no llamo al uno uno dos.',
     medsTaken: (label) => `Vale. Dejo apuntado ${label}. ¿Quieres que te acompañe un momento? Di háblame, o adiós.`,
     medsNotTaken: (label) =>
       `De acuerdo. Cuando tomes ${label}, dime pastillas. No te voy a insistir en que te las tomes ahora.`,
@@ -28,8 +35,19 @@ const COPY = {
       `No pasa nada. Mira el pastillero antes de tomar otra. Cuando sepas si tomaste ${label}, dime pastillas.`,
     medsAsk: (label) => `¿Te tomaste ${label}? Di: me las tomé, todavía no, o no me acuerdo.`,
     medsAllDone: 'Hoy las pastillas que tengo apuntadas ya están. Si quieres, di háblame.',
+    mealAsk: (label) => `¿Ya tomaste ${label}? Di: ya comí, o todavía no.`,
+    mealDone: (label) => `Vale. Dejo apuntado ${label}. Si tocan pastillas, di pastillas. Si quieres, di háblame.`,
+    mealNot: (label) => `De acuerdo. Cuando tomes ${label}, dime comida. No te voy a insistir ahora.`,
+    walkAsk: '¿Has dado un paseo suave o te has movido un poco? Di: ya me he movido, o todavía no. Sin prisas.',
+    walkDone: 'Bien. Un poco de movimiento ya cuenta. Si quieres, di háblame, o qué hora es.',
+    walkNot: 'Vale. Cuando te muevas un poco, dime caminar. Un paseo suave, sin prisas.',
+    clockNow: (spoken, hint) => `${spoken}. ${hint}`,
+    clockHintMeal: (label) => `Toca ${label}. Di comida cuando hayas comido.`,
+    clockHintMeds: (label) => `Toca ${label}. Di pastillas cuando las hayas mirado.`,
+    clockHintWalk: 'Si puedes, un paseo suave. Di caminar.',
+    clockHintRest: 'Si quieres compañía, di háblame.',
     company: [
-      'No estás sola ni solo. Estoy en la mesilla. Respira conmigo: aire adentro... y suelta. Si quieres otro rato, di háblame otra vez.',
+      'No estás solo. Estoy en la mesilla. Respira conmigo: aire adentro... y suelta. Si quieres otro rato, di háblame otra vez.',
       'El día no tiene que ser grande. Haber contestado ya cuenta. ¿Quieres que te pregunte qué tal ha ido, o prefieres adiós?',
       'Te acompaño un momento en silencio... Ya está. Si te apetece, cuéntame algo del día: di háblame.',
       'Un dicho corto: despacio se llega lejos. Yo no me voy. Di háblame para otro rato, o estoy bien si ya está.',
@@ -47,25 +65,28 @@ const COPY = {
     night: (name) => `Buenas noches${name ? `, ${name}` : ''}. Descansa. Si quedan pastillas, di pastillas. Si no, adiós.`,
     whatsNextCheckin: 'Ahora toca decir cómo estás. Di: estoy bien.',
     whatsNextMeds: (label) => `Ahora toca ${label}. Di pastillas cuando las hayas mirado.`,
-    whatsNextRest: 'Ahora no toca nada obligatorio. Di háblame si quieres compañía, o adiós.',
+    whatsNextMeal: (label) => `Ahora toca ${label}. Di comida cuando hayas comido.`,
+    whatsNextWalk: 'Ahora toca moverte un poco. Di caminar cuando te hayas movido, sin prisas.',
+    whatsNextRest: 'Ahora no toca nada obligatorio. Di háblame, qué hora es, o adiós.',
     setupAskPerson: 'Vale. ¿Cómo se llama la persona que va a usar este altavoz? Di: se llama, y el nombre.',
     setupAskCaregiver: (person) =>
       `De acuerdo, ${person}. ¿Y tú, que cuidas, cómo te llamas? Di: yo me llamo, y tu nombre.`,
     setupDone: (person, caregiver) =>
-      `Listo. Este altavoz es el compañero de ${person}${caregiver ? `, y el cuidador es ${caregiver}` : ''}. ${person} puede decir: estoy bien, pastillas, háblame, llama y un nombre, o constantes. Si quieres avisos, di: pon los recordatorios. Para hablar de verdad, guarda a la familia en contactos de Alexa una vez.`,
-    setupNeedName: 'No he pillado el nombre. Di: se llama Ana. Un solo nombre vale.',
+      `Listo. Este altavoz es el compañero de ${person}${caregiver ? `, y el cuidador es ${caregiver}` : ''}. ${person} puede decir: comida, pastillas, caminar, qué hora es, háblame. Si quieres avisos que suenen aunque yo me calle, di: pon los recordatorios.`,
+    setupNeedName: 'No he pillado el nombre. Di: se llama Luis. Un solo nombre vale.',
     remindersAsk:
-      'Voy a pedirte permiso para recordatorios de Alexa. Tú, el cuidador, di que sí. Luego el mayor solo oirá el aviso y dirá: Alexa, abre compañero diario.',
+      'Voy a pedir permiso para recordatorios nativos de Alexa. Tú di que sí. Esos avisos suenan aunque se cierre la skill: desayuno, pastillas, paseo y comida.',
     remindersOk:
-      'Permiso listo. Creo un aviso por la mañana y otro por la noche para abrir compañero diario. El mayor no tiene que tocar la app.',
+      'Permiso listo. Creo avisos nativos de Alexa para desayuno, pastillas, paseo suave y comida. Suenan aunque yo me calle. No hace falta tocar la app.',
     remindersDenied:
-      'Sin permiso no puedo crear avisos de Alexa. El mayor puede abrir la skill diciendo: Alexa, abre compañero diario. Si cambias de idea, di: pon los recordatorios.',
-    remindersCreated: 'Recordatorios diarios listos: mañana y noche. Di adiós, o prueba: estoy bien.',
+      'Sin permiso no puedo crear avisos de la skill. En la app de Alexa puedes poner recordatorios o rutinas nativas: desayuno, pastillas, caminar, comida. O di: pon los recordatorios, si cambias de idea.',
+    remindersCreated:
+      'Avisos listos: desayuno, pastillas, paseo y comida. Suenan aunque se cierre compañero diario. Di adiós, o prueba: qué hora es.',
     remindersFailed:
-      'No he podido crear los recordatorios ahora. La skill sigue valiendo: ábrela a mano. Inténtalo más tarde con: pon los recordatorios.',
-    help: 'Puedes decir: estoy bien, pastillas, háblame, llama Miguel, constantes, o emergencia. Para parar, di adiós. ¿Qué quieres?',
-    helpShort: 'Di: estoy bien, pastillas, háblame, llama y un nombre, o constantes.',
-    fallback: 'No te he entendido. Di: estoy bien, pastillas, háblame, llama y un nombre, o emergencia.',
+      'No he podido crear los recordatorios ahora. Mientras, usa los nativos: Alexa, recuérdame las pastillas. Inténtalo más tarde con: pon los recordatorios.',
+    help: 'Puedes decir: comida, pastillas, caminar, qué hora es, háblame, o estoy bien. Para parar, di adiós. ¿Qué quieres?',
+    helpShort: 'Di: comida, pastillas, caminar, qué hora es, o háblame.',
+    fallback: 'No te he entendido. Di: comida, pastillas, caminar, qué hora es, o háblame.',
     callKnown: (name) =>
       `Para hablar con ${name} la llamada la hace Alexa, no yo. Di adiós, y luego despacio: Alexa, llama a ${name}. El cuidador tiene que haber guardado a ${name} en contactos de Alexa una vez.`,
     callUnknown: (name) =>
@@ -85,34 +106,52 @@ const COPY = {
     vitalsUnusual: ' Ese pulso está fuera de lo habitual en reposo. Si te encuentras mal, di llama y el nombre.',
     goodbye: 'Hasta luego. Aquí sigo.',
     stop: 'Vale. Hasta luego.',
-    yesUnclear: 'Dime con palabras: estoy bien, pastillas, o háblame.',
-    noUnclear: 'Vale. Di estoy bien, pastillas, háblame, o adiós.',
+    yesUnclear: 'Dime con palabras: comida, pastillas, caminar, o háblame.',
+    noUnclear: 'Vale. Di comida, pastillas, caminar, háblame, o adiós.',
     error: 'Perdona, me he liado. Prueba otra vez: estoy bien, o háblame.',
   },
   'en-US': {
     invocation: 'daily companion',
     medsMorning: 'the morning pills',
     medsEvening: 'the evening pills',
+    mealBreakfast: 'breakfast',
+    mealLunch: 'lunch',
+    mealDinner: 'dinner',
     launchNew:
-      'Hi. I am your daily companion. If you are setting this up for someone, say configure. If you live with me, say I am okay, or talk to me.',
+      'Hi, Luis. I am your daily companion. Say: meal, pills, walk, what time is it, or talk to me.',
     launchMorning: (name) => `Hi${name ? `, ${name}` : ''}. How are you this morning? Say: I am okay.`,
     launchAfternoonOk: (name) =>
-      `Hi${name ? `, ${name}` : ''}. You already told me you are okay today. Say talk to me, or pills if it is time.`,
+      `Hi${name ? `, ${name}` : ''}. You already told me you are okay today. Say talk to me, what time is it, or walk.`,
     launchNeedMeds: (name, medsLabel) =>
       `Hi${name ? `, ${name}` : ''}. Did you take ${medsLabel}? Say: I took them, not yet, or I do not remember.`,
+    launchNeedMeal: (name, meal) =>
+      `Hi${name ? `, ${name}` : ''}. Did you have ${meal} yet? Say: I already ate, or not yet.`,
+    launchNeedWalk: (name) =>
+      `Hi${name ? `, ${name}` : ''}. Have you taken a gentle walk or moved a little? Say: I already moved, or not yet.`,
     launchEvening: (name) => `Good evening${name ? `, ${name}` : ''}. How are you? Say: I am okay, or talk to me.`,
     launchNight: (name) =>
       `I am here${name ? `, ${name}` : ''}. Say talk to me for company. If this is urgent, say emergency.`,
     checkInWell: (name) =>
-      `I am glad${name ? `, ${name}` : ''}. Say pills if it is time, or talk to me for company.`,
+      `I am glad${name ? `, ${name}` : ''}. Say meal if it is time to eat, pills if it is time, or talk to me.`,
     checkInUnwell:
-      'I am sorry you are not well. Say talk to me to stay with me. If it is urgent, say emergency.',
+      'I am sorry you are not well. Say talk to me to stay with me. If it is urgent, say emergency. I cannot call emergency services.',
     medsTaken: (label) => `Okay. I noted ${label}. Want company? Say talk to me, or goodbye.`,
     medsNotTaken: (label) => `Okay. When you take ${label}, say pills. I will not push you to take them now.`,
     medsUnsure: (label) =>
       `That is okay. Check the pillbox before taking another. When you know about ${label}, say pills.`,
     medsAsk: (label) => `Did you take ${label}? Say: I took them, not yet, or I do not remember.`,
     medsAllDone: 'The pills I track for today are done. Say talk to me if you want company.',
+    mealAsk: (label) => `Did you have ${label} yet? Say: I already ate, or not yet.`,
+    mealDone: (label) => `Okay. I noted ${label}. Say pills if it is time, or talk to me.`,
+    mealNot: (label) => `Okay. When you have ${label}, say meal. I will not push you now.`,
+    walkAsk: 'Have you taken a gentle walk or moved a little? Say: I already moved, or not yet. No rush.',
+    walkDone: 'Good. A little movement counts. Say talk to me, or what time is it.',
+    walkNot: 'Okay. When you move a little, say walk. A gentle walk, no rush.',
+    clockNow: (spoken, hint) => `${spoken}. ${hint}`,
+    clockHintMeal: (label) => `Time for ${label}. Say meal when you have eaten.`,
+    clockHintMeds: (label) => `Time for ${label}. Say pills when you have checked.`,
+    clockHintWalk: 'If you can, a gentle walk. Say walk.',
+    clockHintRest: 'Say talk to me if you want company.',
     company: [
       'You are not alone. I am on the nightstand. Breathe in... and out. Say talk to me again for another moment.',
       'The day does not have to be big. Answering already counts. Say talk to me, or goodbye.',
@@ -133,26 +172,28 @@ const COPY = {
       `Good night${name ? `, ${name}` : ''}. Rest. If pills are left, say pills. Otherwise goodbye.`,
     whatsNextCheckin: 'Please tell me how you are. Say: I am okay.',
     whatsNextMeds: (label) => `Now it is ${label}. Say pills when you have checked.`,
-    whatsNextRest: 'Nothing required right now. Say talk to me for company, or goodbye.',
+    whatsNextMeal: (label) => `Now it is ${label}. Say meal when you have eaten.`,
+    whatsNextWalk: 'Time to move a little. Say walk when you have moved. No rush.',
+    whatsNextRest: 'Nothing required right now. Say talk to me, what time is it, or goodbye.',
     setupAskPerson: 'Okay. What is the name of the person who will use this speaker? Say: their name is, then the name.',
     setupAskCaregiver: (person) => `Got it, ${person}. And your name, the caregiver? Say: my name is, then your name.`,
     setupDone: (person, caregiver) =>
-      `Done. This speaker is ${person}'s companion${caregiver ? `, and the caregiver is ${caregiver}` : ''}. ${person} can say: I am okay, pills, talk to me, call and a name, or vitals. For alerts, say: set the reminders. For a real call, save family in Alexa contacts once.`,
-    setupNeedName: 'I missed the name. Say: their name is Ana. One first name is enough.',
+      `Done. This speaker is ${person}'s companion${caregiver ? `, and the caregiver is ${caregiver}` : ''}. ${person} can say: meal, pills, walk, what time is it, talk to me. For alerts that still fire if I go quiet, say: set the reminders.`,
+    setupNeedName: 'I missed the name. Say: their name is Luis. One first name is enough.',
     remindersAsk:
-      'I will ask you, the caregiver, for Alexa reminder permission. Say yes. Then the older adult only hears the chime and says: Alexa, open daily companion.',
-    remindersOk: 'Permission granted. I will add a morning and evening reminder to open daily companion.',
+      'I will ask for native Alexa reminder permission. Say yes. Those alerts still speak if the skill session ends: breakfast, pills, a gentle walk, and lunch.',
+    remindersOk: 'Permission granted. I will add native Alexa reminders for breakfast, pills, a gentle walk, and lunch. They still fire if I go quiet.',
     remindersDenied:
-      'Without permission I cannot create Alexa reminders. They can still say: Alexa, open daily companion. Say set the reminders if you change your mind.',
-    remindersCreated: 'Daily reminders are set: morning and night. Say goodbye, or try: I am okay.',
-    remindersFailed: 'I could not create reminders right now. Open the skill by voice. Try set the reminders later.',
-    help: 'You can say: I am okay, pills, talk to me, call Miguel, vitals, or emergency. To stop, say goodbye. What do you need?',
-    helpShort: 'Say: I am okay, pills, talk to me, call and a name, or vitals.',
-    fallback: 'I did not catch that. Say: I am okay, pills, talk to me, call and a name, or emergency.',
+      'Without permission I cannot create skill reminders. You can still set native Alexa reminders or routines for meals, pills, and walking. Say set the reminders if you change your mind.',
+    remindersCreated: 'Reminders are set: breakfast, pills, walk, and lunch. They still fire if daily companion closes. Say goodbye, or try: what time is it.',
+    remindersFailed: 'I could not create reminders right now. Meanwhile say: Alexa, remind me about pills. Try set the reminders later.',
+    help: 'You can say: meal, pills, walk, what time is it, talk to me, or I am okay. To stop, say goodbye. What do you need?',
+    helpShort: 'Say: meal, pills, walk, what time is it, or talk to me.',
+    fallback: 'I did not catch that. Say: meal, pills, walk, what time is it, or talk to me.',
     goodbye: 'See you later. I will be here.',
     stop: 'Okay. See you later.',
-    yesUnclear: 'Please use words: I am okay, pills, or talk to me.',
-    noUnclear: 'Okay. Say I am okay, pills, talk to me, or goodbye.',
+    yesUnclear: 'Please use words: meal, pills, walk, or talk to me.',
+    noUnclear: 'Okay. Say meal, pills, walk, talk to me, or goodbye.',
     error: 'Sorry, I got confused. Try: I am okay, or talk to me.',
     callKnown: (name) =>
       `To talk to ${name}, Alexa places the call, not me. Say goodbye, then slowly: Alexa, call ${name}. The caregiver must save ${name} in Alexa contacts once.`,
@@ -196,6 +237,12 @@ function medsLabel(copy, medsId) {
   return medsId === 'noche' ? copy.medsEvening : copy.medsMorning;
 }
 
+function mealLabel(copy, mealId) {
+  if (mealId === 'cena') return copy.mealDinner;
+  if (mealId === 'desayuno') return copy.mealBreakfast;
+  return copy.mealLunch;
+}
+
 function companyLine(copy, isoDay, hour) {
   const lines = copy.company;
   const index = Math.abs(Number(String(isoDay).replace(/-/g, '')) + hour) % lines.length;
@@ -218,6 +265,7 @@ module.exports = {
   localeBundle,
   wrapSpeak,
   medsLabel,
+  mealLabel,
   companyLine,
   vitalsParts,
 };

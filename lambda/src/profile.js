@@ -4,6 +4,7 @@ const { DEFAULT_TIMEZONE } = require('./time');
 
 const PROFILE_VERSION = 1;
 const MAX_DAYS = 7;
+const DEFAULT_PERSON_NAME = 'Luis';
 
 function defaultMeds() {
   return [
@@ -12,13 +13,22 @@ function defaultMeds() {
   ];
 }
 
+function emptyDay() {
+  return {
+    checkIns: { morning: null, evening: null },
+    meds: { manana: null, noche: null },
+    meals: { desayuno: null, comida: null, cena: null },
+    walk: null,
+  };
+}
+
 function defaultProfile() {
   return {
     version: PROFILE_VERSION,
-    personName: null,
+    personName: DEFAULT_PERSON_NAME,
     caregiverName: null,
     timeZone: DEFAULT_TIMEZONE,
-    setupComplete: false,
+    setupComplete: true,
     remindersGranted: false,
     meds: defaultMeds(),
     contacts: [],
@@ -32,9 +42,12 @@ function mergeProfile(stored) {
   if (!stored || typeof stored !== 'object') {
     return base;
   }
+  const personName = stored.personName === undefined ? base.personName : stored.personName;
   return {
     ...base,
     ...stored,
+    personName: personName || DEFAULT_PERSON_NAME,
+    setupComplete: stored.setupComplete === false ? Boolean(personName) : true,
     meds: Array.isArray(stored.meds) && stored.meds.length ? stored.meds : base.meds,
     contacts: Array.isArray(stored.contacts) ? stored.contacts : [],
     vitals: stored.vitals && typeof stored.vitals === 'object' ? stored.vitals : null,
@@ -44,12 +57,17 @@ function mergeProfile(stored) {
 
 function dayState(profile, isoDay) {
   const existing = profile.days[isoDay];
-  if (existing) {
-    return existing;
+  if (!existing) {
+    return emptyDay();
   }
+  const blank = emptyDay();
   return {
-    checkIns: { morning: null, evening: null },
-    meds: { manana: null, noche: null },
+    ...blank,
+    ...existing,
+    checkIns: { ...blank.checkIns, ...(existing.checkIns || {}) },
+    meds: { ...blank.meds, ...(existing.meds || {}) },
+    meals: { ...blank.meals, ...(existing.meals || {}) },
+    walk: existing.walk == null ? null : existing.walk,
   };
 }
 
@@ -72,8 +90,10 @@ function withNames(profile, { personName, caregiverName }) {
 
 module.exports = {
   PROFILE_VERSION,
+  DEFAULT_PERSON_NAME,
   defaultProfile,
   defaultMeds,
+  emptyDay,
   mergeProfile,
   dayState,
   writeDay,

@@ -1,8 +1,18 @@
 'use strict';
 
-const { clock, dayPart, isMorningMedsWindow, isEveningMedsWindow } = require('./time');
+const {
+  clock,
+  dayPart,
+  isBreakfastWindow,
+  isLunchWindow,
+  isDinnerWindow,
+  isWalkWindow,
+  isMorningMedsWindow,
+  isEveningMedsWindow,
+  speakClock,
+} = require('./time');
 const { dayState, writeDay, withNames, mergeProfile } = require('./profile');
-const { localeBundle, wrapSpeak, medsLabel, companyLine, vitalsParts } = require('./speech');
+const { localeBundle, wrapSpeak, medsLabel, mealLabel, companyLine, vitalsParts } = require('./speech');
 const { addContact, findContact } = require('./contacts');
 const { recordVitals, vitalsAgeHours, unusualHeartRate } = require('./vitals');
 
@@ -14,6 +24,13 @@ const INTENTS = {
   MEDS_TAKEN: 'MedsTaken',
   MEDS_NOT_TAKEN: 'MedsNotTaken',
   MEDS_UNSURE: 'MedsUnsure',
+  MEAL_ASK: 'MealAsk',
+  MEAL_DONE: 'MealDone',
+  MEAL_NOT: 'MealNot',
+  WALK_ASK: 'WalkAsk',
+  WALK_DONE: 'WalkDone',
+  WALK_NOT: 'WalkNot',
+  CLOCK: 'Clock',
   COMPANY: 'Company',
   EMERGENCY: 'Emergency',
   MORNING: 'Morning',
@@ -34,15 +51,34 @@ const INTENTS = {
   RECORD_VITALS: 'RecordVitals',
 };
 
-function medsStillOpen(status) {
-  return status !== 'taken' && status !== 'unsure';
+function stillOpen(status) {
+  return status !== 'taken' && status !== 'unsure' && status !== 'done' && status !== 'skipped';
 }
 
 function dueMedsId(profile, isoDay, hour) {
   const state = dayState(profile, isoDay);
-  if (isMorningMedsWindow(hour) && medsStillOpen(state.meds.manana)) return 'manana';
-  if (isEveningMedsWindow(hour) && medsStillOpen(state.meds.noche)) return 'noche';
+  if (isMorningMedsWindow(hour) && stillOpen(state.meds.manana)) return 'manana';
+  if (isEveningMedsWindow(hour) && stillOpen(state.meds.noche)) return 'noche';
   return null;
+}
+
+function dueMealId(profile, isoDay, hour) {
+  const meals = dayState(profile, isoDay).meals;
+  if (isBreakfastWindow(hour) && stillOpen(meals.desayuno)) return 'desayuno';
+  if (isLunchWindow(hour) && stillOpen(meals.comida)) return 'comida';
+  if (isDinnerWindow(hour) && stillOpen(meals.cena)) return 'cena';
+  return null;
+}
+
+function nearestMealId(hour) {
+  if (hour < 12) return 'desayuno';
+  if (hour < 18) return 'comida';
+  return 'cena';
+}
+
+function walkDue(profile, isoDay, hour) {
+  if (!isWalkWindow(hour)) return false;
+  return stillOpen(dayState(profile, isoDay).walk);
 }
 
 function neededCheckIn(isoDay, hour, profile) {
@@ -59,19 +95,31 @@ function neededCheckIn(isoDay, hour, profile) {
 
 function nextFocus(profile, now = new Date()) {
   const { isoDay, hour, timeZone } = clock(now, profile.timeZone);
+  const mealId = dueMealId(profile, isoDay, hour);
   const medsId = dueMedsId(profile, isoDay, hour);
+  const walk = walkDue(profile, isoDay, hour);
   const checkIn = neededCheckIn(isoDay, hour, profile);
-  const morningGreeting = checkIn === 'morning' && hour < 9;
-  const eveningGreeting = checkIn === 'evening' && hour >= 18 && hour < 20;
   let focus = 'rest';
-  if (morningGreeting || eveningGreeting) {
-    focus = 'checkin';
+  if (mealId) {
+    focus = 'meal';
   } else if (medsId) {
     focus = 'meds';
+  } else if (walk) {
+    focus = 'walk';
   } else if (checkIn) {
     focus = 'checkin';
   }
-  return { isoDay, hour, timeZone, medsId, checkIn, focus, part: dayPart(hour) };
+  return {
+    isoDay,
+    hour,
+    timeZone,
+    mealId,
+    medsId,
+    walkDue: walk,
+    checkIn,
+    focus,
+    part: dayPart(hour),
+  };
 }
 
 function say(copy, text, pending, extra = {}) {
@@ -101,11 +149,20 @@ function launchSpeech(copy, profile, snapshot) {
   if (!profile.setupComplete && !profile.personName) {
     return { text: copy.launchNew, pending: null };
   }
+  if (snapshot.focus === 'meal') {
+    return {
+      text: copy.launchNeedMeal(name, mealLabel(copy, snapshot.mealId)),
+      pending: 'meal',
+    };
+  }
   if (snapshot.focus === 'meds') {
     return {
       text: copy.launchNeedMeds(name, medsLabel(copy, snapshot.medsId)),
       pending: 'meds',
     };
+  }
+  if (snapshot.focus === 'walk') {
+    return { text: copy.launchNeedWalk(name), pending: 'walk' };
   }
   if (snapshot.focus === 'checkin' && snapshot.checkIn === 'morning') {
     return { text: copy.launchMorning(name), pending: 'checkin' };
@@ -131,6 +188,18 @@ function recordMeds(profile, isoDay, medsId, status) {
   return writeDay(profile, isoDay, state);
 }
 
+function recordMeal(profile, isoDay, mealId, status) {
+  const state = { ...dayState(profile, isoDay) };
+  state.meals = { ...state.meals, [mealId]: status };
+  return writeDay(profile, isoDay, state);
+}
+
+function recordWalk(profile, isoDay, status) {
+  const state = { ...dayState(profile, isoDay) };
+  state.walk = status;
+  return writeDay(profile, isoDay, state);
+}
+
 function handleYesNo(intent, pending) {
   if (pending === 'checkin') {
     return intent === INTENTS.YES ? INTENTS.CHECKIN_WELL : INTENTS.CHECKIN_UNWELL;
@@ -138,10 +207,23 @@ function handleYesNo(intent, pending) {
   if (pending === 'meds') {
     return intent === INTENTS.YES ? INTENTS.MEDS_TAKEN : INTENTS.MEDS_NOT_TAKEN;
   }
+  if (pending === 'meal') {
+    return intent === INTENTS.YES ? INTENTS.MEAL_DONE : INTENTS.MEAL_NOT;
+  }
+  if (pending === 'walk') {
+    return intent === INTENTS.YES ? INTENTS.WALK_DONE : INTENTS.WALK_NOT;
+  }
   if (pending === 'emergency') {
     return intent === INTENTS.YES ? INTENTS.EMERGENCY : INTENTS.STOP;
   }
   return intent;
+}
+
+function fallbackForPending(copy, pending, snapshot) {
+  if (pending === 'meds') return copy.medsAsk(medsLabel(copy, snapshot.medsId || 'manana'));
+  if (pending === 'meal') return copy.mealAsk(mealLabel(copy, snapshot.mealId || nearestMealId(snapshot.hour)));
+  if (pending === 'walk') return copy.walkAsk;
+  return copy.fallback;
 }
 
 /**
@@ -184,7 +266,7 @@ function handleTurn({
   }
 
   if (resolved === INTENTS.FALLBACK) {
-    const text = pending === 'meds' ? copy.medsAsk(medsLabel(copy, snapshot.medsId || 'manana')) : copy.fallback;
+    const text = fallbackForPending(copy, pending, snapshot);
     return { profile, lastSpeech: text, ...say(copy, text, pending) };
   }
 
@@ -267,11 +349,53 @@ function handleTurn({
     return { profile, lastSpeech: text, ...say(copy, text, null) };
   }
 
+  if (resolved === INTENTS.CLOCK) {
+    const spoken = speakClock(snapshot.hour, clock(now, snapshot.timeZone).minute, locale);
+    const hint =
+      snapshot.focus === 'meal'
+        ? copy.clockHintMeal(mealLabel(copy, snapshot.mealId))
+        : snapshot.focus === 'meds'
+          ? copy.clockHintMeds(medsLabel(copy, snapshot.medsId))
+          : snapshot.focus === 'walk'
+            ? copy.clockHintWalk
+            : copy.clockHintRest;
+    const text = copy.clockNow(spoken, hint);
+    const nextPending = snapshot.focus === 'rest' || snapshot.focus === 'checkin' ? snapshot.focus === 'checkin' ? 'checkin' : null : snapshot.focus;
+    return { profile, lastSpeech: text, ...say(copy, text, nextPending) };
+  }
+
   if (resolved === INTENTS.CHECKIN_WELL || resolved === INTENTS.CHECKIN_UNWELL) {
     const which = snapshot.checkIn || (snapshot.part === 'evening' || snapshot.part === 'night' ? 'evening' : 'morning');
     const status = resolved === INTENTS.CHECKIN_WELL ? 'well' : 'unwell';
     profile = recordCheckIn(profile, snapshot.isoDay, which, status);
     const text = status === 'well' ? copy.checkInWell(profile.personName) : copy.checkInUnwell;
+    return { profile, lastSpeech: text, ...say(copy, text, null) };
+  }
+
+  if (
+    resolved === INTENTS.MEAL_ASK ||
+    resolved === INTENTS.MEAL_DONE ||
+    resolved === INTENTS.MEAL_NOT
+  ) {
+    const mealId = snapshot.mealId || nearestMealId(snapshot.hour);
+    const label = mealLabel(copy, mealId);
+    if (resolved === INTENTS.MEAL_ASK) {
+      const text = copy.mealAsk(label);
+      return { profile, lastSpeech: text, ...say(copy, text, 'meal') };
+    }
+    const status = resolved === INTENTS.MEAL_DONE ? 'done' : 'skipped';
+    profile = recordMeal(profile, snapshot.isoDay, mealId, status);
+    const text = status === 'done' ? copy.mealDone(label) : copy.mealNot(label);
+    return { profile, lastSpeech: text, ...say(copy, text, null) };
+  }
+
+  if (resolved === INTENTS.WALK_ASK || resolved === INTENTS.WALK_DONE || resolved === INTENTS.WALK_NOT) {
+    if (resolved === INTENTS.WALK_ASK) {
+      return { profile, lastSpeech: copy.walkAsk, ...say(copy, copy.walkAsk, 'walk') };
+    }
+    const status = resolved === INTENTS.WALK_DONE ? 'done' : 'skipped';
+    profile = recordWalk(profile, snapshot.isoDay, status);
+    const text = status === 'done' ? copy.walkDone : copy.walkNot;
     return { profile, lastSpeech: text, ...say(copy, text, null) };
   }
 
@@ -302,17 +426,28 @@ function handleTurn({
 
   if (resolved === INTENTS.NIGHT) {
     const text = copy.night(profile.personName);
-    const nextPending = dueMedsId(profile, snapshot.isoDay, snapshot.hour) ? 'meds' : null;
+    const nextPending = dueMealId(profile, snapshot.isoDay, snapshot.hour)
+      ? 'meal'
+      : dueMedsId(profile, snapshot.isoDay, snapshot.hour)
+        ? 'meds'
+        : null;
     return { profile, lastSpeech: text, ...say(copy, text, nextPending) };
   }
 
   if (resolved === INTENTS.WHATS_NEXT) {
-    if (snapshot.focus === 'checkin') {
-      return { profile, lastSpeech: copy.whatsNextCheckin, ...say(copy, copy.whatsNextCheckin, 'checkin') };
+    if (snapshot.focus === 'meal') {
+      const text = copy.whatsNextMeal(mealLabel(copy, snapshot.mealId));
+      return { profile, lastSpeech: text, ...say(copy, text, 'meal') };
     }
     if (snapshot.focus === 'meds') {
       const text = copy.whatsNextMeds(medsLabel(copy, snapshot.medsId));
       return { profile, lastSpeech: text, ...say(copy, text, 'meds') };
+    }
+    if (snapshot.focus === 'walk') {
+      return { profile, lastSpeech: copy.whatsNextWalk, ...say(copy, copy.whatsNextWalk, 'walk') };
+    }
+    if (snapshot.focus === 'checkin') {
+      return { profile, lastSpeech: copy.whatsNextCheckin, ...say(copy, copy.whatsNextCheckin, 'checkin') };
     }
     return { profile, lastSpeech: copy.whatsNextRest, ...say(copy, copy.whatsNextRest, null) };
   }
@@ -394,10 +529,14 @@ function permissionResult(status, locale = 'es-ES') {
 module.exports = {
   INTENTS,
   dueMedsId,
+  dueMealId,
+  walkDue,
   neededCheckIn,
   nextFocus,
   handleTurn,
   permissionResult,
   recordCheckIn,
   recordMeds,
+  recordMeal,
+  recordWalk,
 };

@@ -11,7 +11,7 @@ const now = new Date('2026-09-16T15:00:00+02:00');
 
 describe('contacts and calling', () => {
   it('coaches native Alexa calling for Miguel without claiming the skill places the call', () => {
-    let profile = withNames(defaultProfile(), { personName: 'Ana', caregiverName: 'Luis' });
+    let profile = withNames(defaultProfile(), { personName: 'Luis', caregiverName: 'Miguel' });
     profile = handleTurn({
       intent: INTENTS.ADD_CONTACT,
       profile,
@@ -30,9 +30,9 @@ describe('contacts and calling', () => {
   });
 
   it('falls back to the caregiver if no name is given', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana', caregiverName: 'Luis' });
+    const profile = withNames(defaultProfile(), { personName: 'Luis', caregiverName: 'Miguel' });
     const turn = handleTurn({ intent: INTENTS.CALL, profile, slots: {}, now });
-    assert.match(turn.card, /Luis/);
+    assert.match(turn.card, /Miguel/);
   });
 
   it('matches names without accents', () => {

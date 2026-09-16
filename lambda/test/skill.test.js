@@ -63,14 +63,14 @@ describe('lambda handler', () => {
   it('answers a Spanish launch', async () => {
     const response = await invoke(envelope({ type: 'LaunchRequest' }));
     const ssml = response.response.outputSpeech.ssml;
-    assert.match(ssml, /compañero diario|configura|estoy bien/i);
+    assert.match(ssml, /compañero diario|Luis|estoy bien|comida/i);
     assert.equal(response.response.shouldEndSession, false);
   });
 
   it('treats ayuda as skill help, not emergency', async () => {
     const response = await invoke(envelope({ intentName: 'AMAZON.HelpIntent' }));
     const ssml = response.response.outputSpeech.ssml;
-    assert.match(ssml, /estoy bien/i);
+    assert.match(ssml, /comida|pastillas|caminar|hora/i);
     assert.doesNotMatch(ssml, /uno uno dos/i);
   });
 

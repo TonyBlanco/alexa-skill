@@ -33,7 +33,8 @@ function persistTurn(handlerInput, turn) {
     pending: turn.pending,
     lastSpeech: turn.lastSpeech,
   });
-  if (typeof handlerInput.attributesManager.setPersistentAttributes === 'function' && process.env.COMPANERO_TABLE) {
+  const persist = process.env.S3_PERSISTENCE_BUCKET || process.env.COMPANERO_TABLE;
+  if (typeof handlerInput.attributesManager.setPersistentAttributes === 'function' && persist) {
     handlerInput.attributesManager.setPersistentAttributes(turn.profile);
   }
 }
@@ -292,6 +293,32 @@ const ConstantesIntentHandler = {
   },
 };
 
+function onIntent(intentName, intentConst, slotNames = []) {
+  return {
+    canHandle(handlerInput) {
+      return (
+        Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
+        Alexa.getIntentName(handlerInput.requestEnvelope) === intentName
+      );
+    },
+    handle(handlerInput) {
+      const slots = {};
+      for (const name of slotNames) {
+        slots[name] = slotValue(handlerInput, name);
+      }
+      return run(handlerInput, intentConst, slots);
+    },
+  };
+}
+
+const ComidaIntentHandler = onIntent('ComidaIntent', INTENTS.MEAL_ASK);
+const ComidaHechaIntentHandler = onIntent('ComidaHechaIntent', INTENTS.MEAL_DONE);
+const ComidaPendienteIntentHandler = onIntent('ComidaPendienteIntent', INTENTS.MEAL_NOT);
+const CaminarIntentHandler = onIntent('CaminarIntent', INTENTS.WALK_ASK);
+const CaminarHechoIntentHandler = onIntent('CaminarHechoIntent', INTENTS.WALK_DONE);
+const CaminarPendienteIntentHandler = onIntent('CaminarPendienteIntent', INTENTS.WALK_NOT);
+const QueHoraEsIntentHandler = onIntent('QueHoraEsIntent', INTENTS.CLOCK);
+
 const RegistrarPulsoIntentHandler = {
   canHandle(handlerInput) {
     return (
@@ -407,6 +434,7 @@ const ConnectionsResponseHandler = {
       const created = await createDailyReminders(handlerInput, {
         timeZone: profile.timeZone,
         locale,
+        personName: profile.personName || 'Luis',
       });
       const text = created.ok ? copy.remindersCreated : copy.remindersFailed;
       const turn = {
@@ -448,7 +476,7 @@ const ErrorHandler = {
 
 const LoadPersistentInterceptor = {
   async process(handlerInput) {
-    if (!process.env.COMPANERO_TABLE) {
+    if (!process.env.S3_PERSISTENCE_BUCKET && !process.env.COMPANERO_TABLE) {
       return;
     }
     try {
@@ -466,7 +494,7 @@ const LoadPersistentInterceptor = {
 
 const SavePersistentInterceptor = {
   async process(handlerInput) {
-    if (!process.env.COMPANERO_TABLE) {
+    if (!process.env.S3_PERSISTENCE_BUCKET && !process.env.COMPANERO_TABLE) {
       return;
     }
     try {
@@ -497,6 +525,13 @@ const requestHandlers = [
   AnadirContactoIntentHandler,
   ConstantesIntentHandler,
   RegistrarPulsoIntentHandler,
+  ComidaIntentHandler,
+  ComidaHechaIntentHandler,
+  ComidaPendienteIntentHandler,
+  CaminarIntentHandler,
+  CaminarHechoIntentHandler,
+  CaminarPendienteIntentHandler,
+  QueHoraEsIntentHandler,
   YesIntentHandler,
   NoIntentHandler,
   HelpIntentHandler,

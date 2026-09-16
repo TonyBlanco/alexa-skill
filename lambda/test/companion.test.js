@@ -2,10 +2,14 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { clock, dayPart } = require('../src/time');
+const { clock, dayPart, speakClock } = require('../src/time');
 const { defaultProfile, withNames } = require('../src/profile');
 const { handleTurn, INTENTS, nextFocus, permissionResult } = require('../src/companion');
-const { scheduledTimeForHour } = require('../src/reminders');
+const { scheduledTimeForHour, dailyReminderSpecs } = require('../src/reminders');
+
+function earlyMorning() {
+  return new Date('2026-09-16T06:45:00+02:00');
+}
 
 function morning() {
   return new Date('2026-09-16T08:30:00+02:00');
@@ -39,22 +43,28 @@ describe('clock', () => {
 });
 
 describe('handleTurn', () => {
-  it('asks the caregiver to configure on first launch', () => {
-    const turn = handleTurn({ intent: INTENTS.LAUNCH, now: morning() });
-    assert.match(turn.card, /configura/i);
+  it('greets Luis on first launch without a caregiver setup', () => {
+    const turn = handleTurn({ intent: INTENTS.LAUNCH, now: earlyMorning() });
+    assert.match(turn.card, /Luis/);
+    assert.equal(turn.profile.personName, 'Luis');
     assert.equal(turn.endSession, false);
   });
 
-  it('asks how the person is in the morning after setup', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana', caregiverName: 'Luis' });
-    const turn = handleTurn({ intent: INTENTS.LAUNCH, profile, now: morning() });
-    assert.match(turn.card, /Ana/);
+  it('asks about breakfast in the morning meal window', () => {
+    const turn = handleTurn({ intent: INTENTS.LAUNCH, now: morning() });
+    assert.match(turn.card, /Luis/);
+    assert.match(turn.card, /desayuno|comí/i);
+    assert.equal(turn.pending, 'meal');
+  });
+
+  it('asks how Luis is before breakfast time', () => {
+    const turn = handleTurn({ intent: INTENTS.LAUNCH, now: earlyMorning() });
     assert.match(turn.card, /estoy bien/i);
     assert.equal(turn.pending, 'checkin');
   });
 
   it('records a well check-in and does not end the session', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana' });
+    const profile = withNames(defaultProfile(), { personName: 'Luis' });
     const turn = handleTurn({
       intent: INTENTS.CHECKIN_WELL,
       profile,
@@ -66,7 +76,7 @@ describe('handleTurn', () => {
   });
 
   it('maps yes to a well check-in when that question is pending', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana' });
+    const profile = withNames(defaultProfile(), { personName: 'Luis' });
     const turn = handleTurn({
       intent: INTENTS.YES,
       profile,
@@ -77,7 +87,7 @@ describe('handleTurn', () => {
   });
 
   it('does not mark pills as taken when the person is unsure', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana' });
+    const profile = withNames(defaultProfile(), { personName: 'Luis' });
     const turn = handleTurn({
       intent: INTENTS.MEDS_UNSURE,
       profile,
@@ -90,22 +100,25 @@ describe('handleTurn', () => {
   });
 
   it('never claims to call emergency services', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana', caregiverName: 'Luis' });
+    const profile = withNames(defaultProfile(), { personName: 'Luis', caregiverName: 'Miguel' });
     const turn = handleTurn({ intent: INTENTS.EMERGENCY, profile, now: afternoon() });
-    assert.match(turn.card, /Luis/);
+    assert.match(turn.card, /Miguel/);
     assert.match(turn.card, /uno uno dos|112/i);
     assert.match(turn.card, /No puedo llamar yo/i);
     assert.match(turn.card, /Alexa, llama/i);
   });
 
-  it('help lists the four phrases and is not the emergency script', () => {
+  it('help lists comida, pastillas, caminar and the time, and is not the emergency script', () => {
     const turn = handleTurn({ intent: INTENTS.HELP, now: afternoon() });
-    assert.match(turn.card, /estoy bien/i);
+    assert.match(turn.card, /comida/i);
+    assert.match(turn.card, /pastillas/i);
+    assert.match(turn.card, /caminar/i);
+    assert.match(turn.card, /hora/i);
     assert.doesNotMatch(turn.card, /uno uno dos/i);
   });
 
   it('company copy is original and short', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana' });
+    const profile = withNames(defaultProfile(), { personName: 'Luis' });
     const turn = handleTurn({ intent: INTENTS.COMPANY, profile, now: afternoon() });
     assert.ok(turn.card.length < 400);
     assert.match(turn.card, /háblame/i);
@@ -131,10 +144,15 @@ describe('handleTurn', () => {
     assert.equal(turn.card, 'Di: estoy bien.');
   });
 
-  it('after a morning check-in and pills, afternoon launch does not interrogate again', () => {
-    let profile = withNames(defaultProfile(), { personName: 'Ana' });
+  it('after meals, pills and a walk, late afternoon does not interrogate again', () => {
+    let profile = withNames(defaultProfile(), { personName: 'Luis' });
     profile = handleTurn({
       intent: INTENTS.CHECKIN_WELL,
+      profile,
+      now: earlyMorning(),
+    }).profile;
+    profile = handleTurn({
+      intent: INTENTS.MEAL_DONE,
       profile,
       now: morning(),
     }).profile;
@@ -143,12 +161,27 @@ describe('handleTurn', () => {
       profile,
       now: midMorningMeds(),
     }).profile;
-    const launch = handleTurn({ intent: INTENTS.LAUNCH, profile, now: afternoon() });
-    assert.match(launch.card, /ya me dijiste que estás bien/i);
+    profile = handleTurn({
+      intent: INTENTS.WALK_DONE,
+      profile,
+      now: midMorningMeds(),
+    }).profile;
+    profile = handleTurn({
+      intent: INTENTS.MEAL_DONE,
+      profile,
+      now: afternoon(),
+    }).profile;
+    const launch = handleTurn({
+      intent: INTENTS.LAUNCH,
+      profile,
+      now: new Date('2026-09-16T16:45:00+02:00'),
+    });
+    assert.match(launch.card, /ya me dijiste que estás bien|háblame/i);
+    assert.equal(launch.pending, null);
   });
 
   it('does not mark pills taken if the person says yes after a check-in', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana' });
+    const profile = withNames(defaultProfile(), { personName: 'Luis' });
     const checked = handleTurn({
       intent: INTENTS.CHECKIN_WELL,
       profile,
@@ -185,10 +218,23 @@ describe('handleTurn', () => {
     assert.equal(done.profile.caregiverName, 'Luis');
   });
 
-  it('evening focuses on remaining pills', () => {
-    const profile = withNames(defaultProfile(), { personName: 'Ana' });
+  it('evening focuses on dinner before night pills', () => {
+    const profile = withNames(defaultProfile(), { personName: 'Luis' });
     const snapshot = nextFocus(profile, evening());
-    assert.equal(snapshot.medsId, 'noche');
+    assert.equal(snapshot.mealId, 'cena');
+    assert.equal(snapshot.focus, 'meal');
+    const turn = handleTurn({ intent: INTENTS.LAUNCH, profile, now: evening() });
+    assert.match(turn.card, /cena|comí/i);
+    assert.equal(turn.pending, 'meal');
+  });
+
+  it('after dinner, evening launch asks about night pills', () => {
+    let profile = withNames(defaultProfile(), { personName: 'Luis' });
+    profile = handleTurn({
+      intent: INTENTS.MEAL_DONE,
+      profile,
+      now: evening(),
+    }).profile;
     const turn = handleTurn({ intent: INTENTS.LAUNCH, profile, now: evening() });
     assert.match(turn.card, /noche/i);
     assert.equal(turn.pending, 'meds');
@@ -211,5 +257,35 @@ describe('handleTurn', () => {
     assert.equal(stamp, '2026-09-17T09:00:00');
     const sameMorning = scheduledTimeForHour(9, new Date('2026-09-16T08:00:00+02:00'), 'Europe/Madrid');
     assert.equal(sameMorning, '2026-09-16T09:00:00');
+  });
+
+  it('records a meal when Luis says ya comí', () => {
+    const turn = handleTurn({ intent: INTENTS.MEAL_DONE, now: morning() });
+    assert.equal(turn.profile.days['2026-09-16'].meals.desayuno, 'done');
+    assert.match(turn.card, /desayuno/i);
+  });
+
+  it('records a gentle walk without rushing him', () => {
+    const turn = handleTurn({ intent: INTENTS.WALK_DONE, now: midMorningMeds() });
+    assert.equal(turn.profile.days['2026-09-16'].walk, 'done');
+    assert.match(turn.card, /movimiento|paseo|háblame/i);
+    assert.doesNotMatch(turn.card, /corre|running/i);
+  });
+
+  it('tells the time in Spanish', () => {
+    assert.equal(speakClock(9, 0, 'es-ES'), 'Son las nueve en punto de la mañana');
+    const turn = handleTurn({ intent: INTENTS.CLOCK, now: morning() });
+    assert.match(turn.card, /ocho/i);
+    assert.match(turn.card, /desayuno|comida|pastillas|paseo|háblame/i);
+  });
+
+  it('native reminders name meals, pills and walk, not only reopen the skill', () => {
+    const specs = dailyReminderSpecs({ locale: 'es-ES', personName: 'Luis' });
+    const joined = specs.map((item) => item.text).join(' ');
+    assert.match(joined, /desayuno/i);
+    assert.match(joined, /pastillas/i);
+    assert.match(joined, /paseo|moverte/i);
+    assert.match(joined, /comida/i);
+    assert.doesNotMatch(joined, /abre compañero diario/i);
   });
 });

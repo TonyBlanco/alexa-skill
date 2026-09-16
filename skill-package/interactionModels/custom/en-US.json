@@ -71,6 +71,70 @@
           ]
         },
         {
+          "name": "ComidaIntent",
+          "slots": [],
+          "samples": [
+            "meal",
+            "breakfast",
+            "lunch",
+            "dinner",
+            "time to eat"
+          ]
+        },
+        {
+          "name": "ComidaHechaIntent",
+          "slots": [],
+          "samples": [
+            "I already ate",
+            "I had breakfast",
+            "I had lunch"
+          ]
+        },
+        {
+          "name": "ComidaPendienteIntent",
+          "slots": [],
+          "samples": [
+            "I have not eaten",
+            "not eaten yet"
+          ]
+        },
+        {
+          "name": "CaminarIntent",
+          "slots": [],
+          "samples": [
+            "walk",
+            "a walk",
+            "gentle walk",
+            "time to walk"
+          ]
+        },
+        {
+          "name": "CaminarHechoIntent",
+          "slots": [],
+          "samples": [
+            "I already moved",
+            "I already walked",
+            "I took a walk"
+          ]
+        },
+        {
+          "name": "CaminarPendienteIntent",
+          "slots": [],
+          "samples": [
+            "I have not walked",
+            "not walked yet"
+          ]
+        },
+        {
+          "name": "QueHoraEsIntent",
+          "slots": [],
+          "samples": [
+            "what time is it",
+            "what's the time",
+            "tell me the time"
+          ]
+        },
+        {
           "name": "CompaniaIntent",
           "slots": [],
           "samples": [

@@ -1,28 +1,34 @@
 # Compañero diario
 
-Skill de Alexa para personas mayores que viven solas o dependen de un cuidador. El cuidador configura una vez. El mayor habla con frases cortas, en español, desde el Echo de la mesilla.
+Skill de Alexa para **Luis Antonio Blanco**. Frases cortas, en español, desde el Echo de la mesilla.
 
-Invocación: **compañero diario** (`Alexa, abre compañero diario`).
+Invocación: **compañero diario**
 
-Producto e investigación: el plan vive fuera de este repo en el Agent Store del proyecto (`docs/skill-mayores.md`). Este README es la guía de código.
+> **Alexa, abre compañero diario**
 
-## Qué hace (V1)
+Alojamiento: **Alexa-hosted (Node.js)**. No uses API Gateway ni Lambda de pago. Amazon pone el backend gratis.
 
-- Check-in: «estoy bien» / «no estoy bien»
+## Probarlo en el Echo de Luis (una vez)
+
+Misma cuenta Amazon que el altavoz. Idioma del Echo: **español (España)**.
+
+1. Entra en [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask) y pulsa **Create Skill**.
+2. Nombre: `Compañero diario`. Idioma: **Spanish (Spain)**. Modelo: **Custom**. Hosting: **Alexa-hosted (Node.js)** (Europa/Irlanda si sale). **No** elijas “Provision your own”.
+3. Pestaña **Build** → **JSON Editor**: pega `skill-package/interactionModels/custom/es-ES.json` → **Save Model** → **Build Model**.
+4. Pestaña **Code**: copia `lambda/index.js`, `lambda/package.json` y la carpeta `lambda/src/` → **Save** → **Deploy**.
+5. **El clic que falta:** pestaña **Test** → “Skill testing is enabled in” → **Development**.
+6. En el Echo: **Alexa, abre compañero diario**.
+
+Si se cierra sola, los avisos nativos siguen valiendo: di **pon los recordatorios** y acepta el permiso, o en la app crea recordatorios/rutinas de desayuno, pastillas, paseo y comida.
+
+## Qué hace
+
+- Comida: «comida», «ya comí», «todavía no»
 - Pastillas: pregunta si se las tomó; «no me acuerdo» **no** marca la toma
-- Compañía: textos cortos originales
-- Emergencia: se queda con la persona y recuerda `Alexa, llama a…`. **No llama al 112**
-- «llama Miguel»: dicta la llamada nativa; el cuidador guarda el contacto en Alexa una vez
-- Constantes: lee el último pulso guardado; **no** es un dato médico
-- Configuración por voz: «configura», «añade a Miguel»
-- Configuración por voz: «configura»
-- Recordatorios ASK opcionales (el cuidador dice que sí al permiso)
-
-## Estructura
-
-- `skill-package/` — manifiesto e interaction models (`es-ES`, `en-US`)
-- `lambda/` — ASK SDK v2 (`index.js` + `src/` + `test/`)
-- `ask-resources.json` — ASK CLI
+- Caminar: paseo suave, sin prisas
+- Hora: «qué hora es»
+- Compañía: «háblame»
+- Emergencia: se queda con él y recuerda `Alexa, llama a…`. **No llama al 112**
 
 ## Desarrollo
 
@@ -32,18 +38,10 @@ npm install
 npm test
 ```
 
-Node 18+. Antes de desplegar, sustituye `YOUR_AWS_ACCOUNT_ID` en `skill-package/skill.json`.
-
-Persistencia DynamoDB: opcional, variable `COMPANERO_TABLE`. Sin ella, el perfil vive en la sesión.
+Node 18+. Persistencia: en Alexa-hosted usa el bucket `S3_PERSISTENCE_BUCKET` (incluido). Sin eso, el perfil vive en la sesión.
 
 ## Frases
 
-Mayor: `estoy bien` · `pastillas` · `háblame` · `llama Miguel` · `constantes` · `emergencia`
+Luis: `comida` · `pastillas` · `caminar` · `qué hora es` · `háblame` · `estoy bien`
 
-Cuidador (una vez): `configura` · `añade a Miguel` · `pon los recordatorios` · `pulso 72` (apaño si mira el reloj)
-
-## Requisitos
-
-- Cuenta [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask)
-- AWS Lambda (o endpoint compatible)
-- El Echo debe estar en una cuenta que el **cuidador** pueda administrar
+Una vez: `pon los recordatorios`
