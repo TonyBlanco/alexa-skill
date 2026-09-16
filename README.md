@@ -6,9 +6,19 @@ Invocación: **compañero diario**
 
 > **Alexa, abre compañero diario**
 
-Alojamiento: **Alexa-hosted (Node.js)**. No uses API Gateway ni Lambda de pago. Amazon pone el backend gratis.
+## En el teléfono (app Alexa)
 
-## Probarlo en el Echo de Luis (una vez)
+1. **Más**
+2. **Skills y juegos**
+3. **Tus skills**
+4. **Dev**
+5. **Compañero diario** → **Activar**
+
+Luego, al Echo: **Alexa, abre compañero diario**
+
+Si **Dev** está vacío: crea la skill una vez como **Alexa-hosted (Node.js)** (abajo). No uses API Gateway ni el portal de 33 Digital.
+
+## Primera vez en el ordenador (solo si Dev está vacío)
 
 Misma cuenta Amazon que el altavoz. Idioma del Echo: **español (España)**.
 
