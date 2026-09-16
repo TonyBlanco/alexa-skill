@@ -1,17 +1,18 @@
 {
   "name": "alexa-skill-lambda",
-  "version": "1.0.0",
-  "description": "Handler Lambda para la skill de Alexa",
+  "version": "0.3.0",
+  "description": "Compañero diario: skill Alexa para Luis (ASK SDK, Alexa-hosted)",
   "main": "index.js",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test test/*.test.js"
   },
   "engines": {
     "node": ">=18.x"
   },
   "dependencies": {
     "ask-sdk-core": "^2.14.0",
-    "ask-sdk-model": "^1.86.0"
+    "ask-sdk-model": "^1.86.0",
+    "ask-sdk-s3-persistence-adapter": "^2.14.0"
   },
   "devDependencies": {
     "ask-sdk-local-debug": "^1.1.0"

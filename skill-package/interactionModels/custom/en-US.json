@@ -1,15 +1,285 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "sample skill",
+      "invocationName": "daily companion",
       "intents": [
         {
-          "name": "HelloWorldIntent",
+          "name": "CheckInWellIntent",
           "slots": [],
           "samples": [
-            "hello",
-            "say hello",
-            "hi"
+            "I am okay",
+            "I'm okay",
+            "I am fine",
+            "I'm fine",
+            "I am well",
+            "doing okay",
+            "I already got up",
+            "I am here"
+          ]
+        },
+        {
+          "name": "CheckInUnwellIntent",
+          "slots": [],
+          "samples": [
+            "I am not okay",
+            "I'm not well",
+            "I feel bad",
+            "I feel sick",
+            "not well",
+            "it hurts"
+          ]
+        },
+        {
+          "name": "MedicacionIntent",
+          "slots": [],
+          "samples": [
+            "pills",
+            "medicine",
+            "medication",
+            "my pills",
+            "pill time"
+          ]
+        },
+        {
+          "name": "MedicacionTomadaIntent",
+          "slots": [],
+          "samples": [
+            "I took them",
+            "I already took them",
+            "pills taken",
+            "I took my pills"
+          ]
+        },
+        {
+          "name": "MedicacionPendienteIntent",
+          "slots": [],
+          "samples": [
+            "not yet",
+            "I have not taken them",
+            "later",
+            "not now"
+          ]
+        },
+        {
+          "name": "MedicacionInseguraIntent",
+          "slots": [],
+          "samples": [
+            "I don't remember",
+            "I do not remember",
+            "I am not sure",
+            "I don't know"
+          ]
+        },
+        {
+          "name": "ComidaIntent",
+          "slots": [],
+          "samples": [
+            "meal",
+            "breakfast",
+            "lunch",
+            "dinner",
+            "time to eat"
+          ]
+        },
+        {
+          "name": "ComidaHechaIntent",
+          "slots": [],
+          "samples": [
+            "I already ate",
+            "I had breakfast",
+            "I had lunch"
+          ]
+        },
+        {
+          "name": "ComidaPendienteIntent",
+          "slots": [],
+          "samples": [
+            "I have not eaten",
+            "not eaten yet"
+          ]
+        },
+        {
+          "name": "CaminarIntent",
+          "slots": [],
+          "samples": [
+            "walk",
+            "a walk",
+            "gentle walk",
+            "time to walk"
+          ]
+        },
+        {
+          "name": "CaminarHechoIntent",
+          "slots": [],
+          "samples": [
+            "I already moved",
+            "I already walked",
+            "I took a walk"
+          ]
+        },
+        {
+          "name": "CaminarPendienteIntent",
+          "slots": [],
+          "samples": [
+            "I have not walked",
+            "not walked yet"
+          ]
+        },
+        {
+          "name": "QueHoraEsIntent",
+          "slots": [],
+          "samples": [
+            "what time is it",
+            "what's the time",
+            "tell me the time"
+          ]
+        },
+        {
+          "name": "CompaniaIntent",
+          "slots": [],
+          "samples": [
+            "talk to me",
+            "keep me company",
+            "stay with me",
+            "I am lonely",
+            "I am alone",
+            "tell me something"
+          ]
+        },
+        {
+          "name": "EmergenciaIntent",
+          "slots": [],
+          "samples": [
+            "emergency",
+            "this is an emergency",
+            "I need real help"
+          ]
+        },
+        {
+          "name": "BuenosDiasIntent",
+          "slots": [],
+          "samples": [
+            "good morning",
+            "morning"
+          ]
+        },
+        {
+          "name": "BuenasNochesIntent",
+          "slots": [],
+          "samples": [
+            "good night",
+            "I am going to sleep"
+          ]
+        },
+        {
+          "name": "QueTocaIntent",
+          "slots": [],
+          "samples": [
+            "what's next",
+            "what should I do",
+            "what now"
+          ]
+        },
+        {
+          "name": "ConfigurarIntent",
+          "slots": [
+            {
+              "name": "personName",
+              "type": "AMAZON.FirstName"
+            },
+            {
+              "name": "caregiverName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "configure",
+            "set up",
+            "setup",
+            "their name is {personName}",
+            "my name is {caregiverName}",
+            "configure for {personName}"
+          ]
+        },
+        {
+          "name": "NombreIntent",
+          "slots": [
+            {
+              "name": "personName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "my name is {personName}",
+            "I am {personName}",
+            "{personName}"
+          ]
+        },
+        {
+          "name": "RecordatoriosIntent",
+          "slots": [],
+          "samples": [
+            "set the reminders",
+            "create reminders",
+            "remind me about pills",
+            "turn on reminders"
+          ]
+        },
+        {
+          "name": "LlamaContactoIntent",
+          "slots": [
+            {
+              "name": "contactName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "call {contactName}",
+            "call my son",
+            "I want to talk to {contactName}",
+            "talk to {contactName}"
+          ]
+        },
+        {
+          "name": "AnadirContactoIntent",
+          "slots": [
+            {
+              "name": "contactName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "add {contactName}",
+            "add contact {contactName}",
+            "my son is {contactName}"
+          ]
+        },
+        {
+          "name": "ConstantesIntent",
+          "slots": [],
+          "samples": [
+            "vitals",
+            "pulse",
+            "how is my pulse",
+            "watch reading"
+          ]
+        },
+        {
+          "name": "RegistrarPulsoIntent",
+          "slots": [
+            {
+              "name": "heartRate",
+              "type": "AMAZON.NUMBER"
+            },
+            {
+              "name": "spo2",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "pulse {heartRate}",
+            "heart rate {heartRate}",
+            "pulse {heartRate} oxygen {spo2}"
           ]
         },
         {
@@ -18,14 +288,40 @@
         },
         {
           "name": "AMAZON.HelpIntent",
-          "samples": []
+          "samples": [
+            "help",
+            "what can I say"
+          ]
         },
         {
           "name": "AMAZON.StopIntent",
-          "samples": []
+          "samples": [
+            "goodbye",
+            "stop",
+            "bye"
+          ]
         },
         {
           "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.YesIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.RepeatIntent",
+          "samples": [
+            "repeat",
+            "say that again"
+          ]
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
           "samples": []
         }
       ],

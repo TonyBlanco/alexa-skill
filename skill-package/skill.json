@@ -3,38 +3,64 @@
     "publishingInformation": {
       "locales": {
         "es-ES": {
-          "summary": "Skill de ejemplo lista para personalizar",
+          "summary": "Compañero de mesilla para Luis: comida, pastillas, paseo suave, la hora y compañía. Alexa-hosted, sin API Gateway.",
           "examplePhrases": [
-            "Alexa, abre skill de ejemplo",
-            "Alexa, lanza skill de ejemplo"
+            "Alexa, abre compañero diario",
+            "Alexa, abre compañero diario y dime qué hora es",
+            "Alexa, pide a compañero diario las pastillas"
           ],
-          "keywords": [],
-          "name": "Skill de ejemplo",
-          "description": "Plantilla inicial para una custom skill de Alexa con intents básicos."
+          "keywords": [
+            "mayores",
+            "pastillas",
+            "comida",
+            "caminar",
+            "compañía"
+          ],
+          "name": "Compañero diario",
+          "description": "Acompañante de voz para Luis Antonio Blanco. Frases cortas: comida, pastillas, caminar, qué hora es, háblame. No es un servicio médico ni llama al 112. Los recordatorios nativos de Alexa siguen sonando si se cierra la skill. Alojada por Alexa (gratis); no uses API Gateway ni Lambda de pago."
         },
         "en-US": {
-          "summary": "Sample skill ready to customize",
+          "summary": "Nightstand companion: meals, pills, a gentle walk, the time, and company. Alexa-hosted.",
           "examplePhrases": [
-            "Alexa, open sample skill",
-            "Alexa, launch sample skill"
+            "Alexa, open daily companion",
+            "Alexa, open daily companion and ask what time is it",
+            "Alexa, ask daily companion about pills"
           ],
-          "keywords": [],
-          "name": "Sample Skill",
-          "description": "Starter template for an Alexa custom skill with basic intents."
+          "keywords": [
+            "seniors",
+            "pills",
+            "meals",
+            "walk",
+            "companion"
+          ],
+          "name": "Daily Companion",
+          "description": "Voice companion for Luis. Short phrases: meal, pills, walk, what time is it, talk to me. Not a medical device and does not call emergency services. Native Alexa reminders still fire if the skill session ends."
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Di hola tras abrir la skill.",
-      "category": "KNOWLEDGE_AND_TRIVIA",
+      "testingInstructions": "Crear como Alexa-hosted (Node.js), idioma español (España). Pestaña Test: Skill testing is enabled in Development. En el Echo de la misma cuenta: «Alexa, abre compañero diario». Probar: comida, pastillas, caminar, qué hora es. Emergencia NO debe prometer el 112. No usar API Gateway.",
+      "category": "HEALTH_AND_FITNESS",
       "distributionCountries": []
     },
     "apis": {
       "custom": {
         "endpoint": {
-          "uri": "arn:aws:lambda:us-east-1:YOUR_AWS_ACCOUNT_ID:function:alexa-skill"
+          "uri": "arn:aws:lambda:eu-west-1:ALEXA_HOSTED:function:companero-diario"
         },
         "interfaces": []
       }
+    },
+    "permissions": [
+      {
+        "name": "alexa::alerts:reminders:skill:readwrite"
+      }
+    ],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": true,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false
     },
     "manifestVersion": "1.0"
   }

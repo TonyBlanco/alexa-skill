@@ -1,15 +1,345 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "skill de ejemplo",
+      "invocationName": "compañero diario",
       "intents": [
         {
-          "name": "HelloWorldIntent",
+          "name": "CheckInWellIntent",
           "slots": [],
           "samples": [
-            "hola",
-            "di hola",
-            "saluda"
+            "estoy bien",
+            "todo bien",
+            "aquí estoy",
+            "ya me levanté",
+            "ya me he levantado",
+            "ya estoy despierto",
+            "ya estoy despierta",
+            "me encuentro bien",
+            "estoy bien gracias",
+            "sí estoy bien",
+            "todo va bien",
+            "estoy aquí"
+          ]
+        },
+        {
+          "name": "CheckInUnwellIntent",
+          "slots": [],
+          "samples": [
+            "mal",
+            "estoy mal",
+            "no estoy bien",
+            "me encuentro mal",
+            "no me encuentro bien",
+            "estoy regular",
+            "me duele",
+            "estoy enfermo",
+            "estoy enferma",
+            "hoy estoy mal"
+          ]
+        },
+        {
+          "name": "MedicacionIntent",
+          "slots": [],
+          "samples": [
+            "pastillas",
+            "medicina",
+            "medicación",
+            "las pastillas",
+            "la medicina",
+            "hora de las pastillas",
+            "qué hay de las pastillas"
+          ]
+        },
+        {
+          "name": "MedicacionTomadaIntent",
+          "slots": [],
+          "samples": [
+            "me las tomé",
+            "me las he tomado",
+            "ya me las tomé",
+            "ya me tomé las pastillas",
+            "ya tomé la medicina",
+            "tomadas",
+            "ya están tomadas",
+            "sí me las tomé"
+          ]
+        },
+        {
+          "name": "MedicacionPendienteIntent",
+          "slots": [],
+          "samples": [
+            "todavía no",
+            "aún no",
+            "no me las tomé",
+            "no las he tomado",
+            "luego",
+            "más tarde",
+            "ahora no"
+          ]
+        },
+        {
+          "name": "MedicacionInseguraIntent",
+          "slots": [],
+          "samples": [
+            "no me acuerdo",
+            "no recuerdo",
+            "no sé",
+            "no sé si me las tomé",
+            "no estoy seguro",
+            "no estoy segura"
+          ]
+        },
+        {
+          "name": "ComidaIntent",
+          "slots": [],
+          "samples": [
+            "comida",
+            "desayuno",
+            "cena",
+            "la comida",
+            "el desayuno",
+            "hora de comer",
+            "qué hay de comer",
+            "tengo hambre"
+          ]
+        },
+        {
+          "name": "ComidaHechaIntent",
+          "slots": [],
+          "samples": [
+            "ya comí",
+            "ya he comido",
+            "ya desayuné",
+            "ya cené",
+            "ya tomé el desayuno"
+          ]
+        },
+        {
+          "name": "ComidaPendienteIntent",
+          "slots": [],
+          "samples": [
+            "todavía no he comido",
+            "aún no he comido",
+            "no he comido",
+            "no he desayunado",
+            "luego como"
+          ]
+        },
+        {
+          "name": "CaminarIntent",
+          "slots": [],
+          "samples": [
+            "caminar",
+            "paseo",
+            "el paseo",
+            "moverme",
+            "hora de caminar",
+            "un paseo suave"
+          ]
+        },
+        {
+          "name": "CaminarHechoIntent",
+          "slots": [],
+          "samples": [
+            "ya me he movido",
+            "ya me moví",
+            "ya paseé",
+            "ya di un paseo",
+            "ya caminé"
+          ]
+        },
+        {
+          "name": "CaminarPendienteIntent",
+          "slots": [],
+          "samples": [
+            "todavía no he caminado",
+            "aún no he salido",
+            "no he paseado",
+            "luego camino"
+          ]
+        },
+        {
+          "name": "QueHoraEsIntent",
+          "slots": [],
+          "samples": [
+            "qué hora es",
+            "qué hora",
+            "dime la hora",
+            "la hora",
+            "qué horas son"
+          ]
+        },
+        {
+          "name": "CompaniaIntent",
+          "slots": [],
+          "samples": [
+            "háblame",
+            "acompaña",
+            "quédate conmigo",
+            "estoy sola",
+            "estoy solo",
+            "hazme compañía",
+            "quédate",
+            "cuéntame algo",
+            "no me dejes"
+          ]
+        },
+        {
+          "name": "EmergenciaIntent",
+          "slots": [],
+          "samples": [
+            "emergencia",
+            "es una emergencia",
+            "necesito ayuda de verdad",
+            "socorro",
+            "ayúdame ahora"
+          ]
+        },
+        {
+          "name": "BuenosDiasIntent",
+          "slots": [],
+          "samples": [
+            "buenos días",
+            "buen día",
+            "ya es de día",
+            "me despierto"
+          ]
+        },
+        {
+          "name": "BuenasNochesIntent",
+          "slots": [],
+          "samples": [
+            "buenas noches",
+            "me voy a dormir",
+            "hasta mañana",
+            "ya es de noche"
+          ]
+        },
+        {
+          "name": "QueTocaIntent",
+          "slots": [],
+          "samples": [
+            "qué toca",
+            "qué hay que hacer",
+            "ahora qué",
+            "qué toca ahora",
+            "qué me toca"
+          ]
+        },
+        {
+          "name": "ConfigurarIntent",
+          "slots": [
+            {
+              "name": "personName",
+              "type": "AMAZON.FirstName"
+            },
+            {
+              "name": "caregiverName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "configura",
+            "configuración",
+            "configurar",
+            "empezar configuración",
+            "se llama {personName}",
+            "la persona se llama {personName}",
+            "el mayor se llama {personName}",
+            "yo me llamo {caregiverName}",
+            "configura para {personName}",
+            "cuidador {caregiverName}"
+          ]
+        },
+        {
+          "name": "NombreIntent",
+          "slots": [
+            {
+              "name": "personName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "me llamo {personName}",
+            "mi nombre es {personName}"
+          ]
+        },
+        {
+          "name": "RecordatoriosIntent",
+          "slots": [],
+          "samples": [
+            "pon los recordatorios",
+            "crea los recordatorios",
+            "recuérdame las pastillas",
+            "activa los avisos",
+            "pon avisos",
+            "recuérdame comer",
+            "recuérdame caminar"
+          ]
+        },
+        {
+          "name": "LlamaContactoIntent",
+          "slots": [
+            {
+              "name": "contactName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "llama a {contactName}",
+            "llama {contactName}",
+            "quiero hablar con {contactName}",
+            "habla con {contactName}",
+            "llama a mi hijo",
+            "llama a mi hija",
+            "llama a la familia"
+          ]
+        },
+        {
+          "name": "AnadirContactoIntent",
+          "slots": [
+            {
+              "name": "contactName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "añade a {contactName}",
+            "añade contacto {contactName}",
+            "el hijo se llama {contactName}",
+            "la hija se llama {contactName}",
+            "apunta a {contactName}"
+          ]
+        },
+        {
+          "name": "ConstantesIntent",
+          "slots": [],
+          "samples": [
+            "constantes",
+            "el pulso",
+            "cómo está el pulso",
+            "cómo está el reloj",
+            "tensión",
+            "oxígeno"
+          ]
+        },
+        {
+          "name": "RegistrarPulsoIntent",
+          "slots": [
+            {
+              "name": "heartRate",
+              "type": "AMAZON.NUMBER"
+            },
+            {
+              "name": "spo2",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "pulso {heartRate}",
+            "el pulso es {heartRate}",
+            "pulso {heartRate} oxígeno {spo2}",
+            "anota pulso {heartRate}"
           ]
         },
         {
@@ -18,14 +348,45 @@
         },
         {
           "name": "AMAZON.HelpIntent",
-          "samples": []
+          "samples": [
+            "ayuda",
+            "qué puedo decir",
+            "no sé qué decir",
+            "ayúdame"
+          ]
         },
         {
           "name": "AMAZON.StopIntent",
-          "samples": []
+          "samples": [
+            "adiós",
+            "hasta luego",
+            "para",
+            "basta"
+          ]
         },
         {
           "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.YesIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.RepeatIntent",
+          "samples": [
+            "repite",
+            "otra vez",
+            "qué has dicho",
+            "más alto"
+          ]
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
           "samples": []
         }
       ],

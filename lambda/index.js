@@ -1,83 +1,45 @@
+'use strict';
+
 const Alexa = require('ask-sdk-core');
+const {
+  requestHandlers,
+  ErrorHandler,
+  LoadPersistentInterceptor,
+  SavePersistentInterceptor,
+} = require('./src/handlers');
 
-const LaunchRequestHandler = {
-  canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
-  },
-  handle(handlerInput) {
-    const speech = 'Bienvenido a tu skill de Alexa. Di hola para empezar.';
-    return handlerInput.responseBuilder.speak(speech).reprompt(speech).getResponse();
-  },
-};
+function persistenceAdapter() {
+  if (process.env.S3_PERSISTENCE_BUCKET) {
+    try {
+      // Alexa-hosted provides this bucket at no extra cost. Do not use API Gateway.
+      // eslint-disable-next-line global-require
+      const { S3PersistenceAdapter } = require('ask-sdk-s3-persistence-adapter');
+      return new S3PersistenceAdapter({ bucketName: process.env.S3_PERSISTENCE_BUCKET });
+    } catch (error) {
+      console.warn('S3 persistence adapter not installed; session only.', error.message);
+    }
+  }
+  return null;
+}
 
-const HelloWorldIntentHandler = {
-  canHandle(handlerInput) {
-    return (
-      Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) === 'HelloWorldIntent'
-    );
-  },
-  handle(handlerInput) {
-    const speech = 'Hola. Esta skill está lista para que la personalices.';
-    return handlerInput.responseBuilder.speak(speech).getResponse();
-  },
-};
+function buildSkill() {
+  const builder = Alexa.SkillBuilders.custom()
+    .addRequestHandlers(...requestHandlers)
+    .addRequestInterceptors(LoadPersistentInterceptor)
+    .addResponseInterceptors(SavePersistentInterceptor)
+    .addErrorHandlers(ErrorHandler)
+    .withApiClient(new Alexa.DefaultApiClient())
+    .withCustomUserAgent('companero-diario/0.2');
 
-const HelpIntentHandler = {
-  canHandle(handlerInput) {
-    return (
-      Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent'
-    );
-  },
-  handle(handlerInput) {
-    const speech = 'Puedes decir hola. ¿En qué más puedo ayudarte?';
-    return handlerInput.responseBuilder.speak(speech).reprompt(speech).getResponse();
-  },
-};
+  const adapter = persistenceAdapter();
+  if (adapter) {
+    builder.withPersistenceAdapter(adapter);
+  }
 
-const CancelAndStopIntentHandler = {
-  canHandle(handlerInput) {
-    return (
-      Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' &&
-      (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent' ||
-        Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent')
-    );
-  },
-  handle(handlerInput) {
-    const speech = 'Hasta luego.';
-    return handlerInput.responseBuilder.speak(speech).getResponse();
-  },
-};
+  return builder;
+}
 
-const SessionEndedRequestHandler = {
-  canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
-  },
-  handle(handlerInput) {
-    console.log(`Session ended: ${JSON.stringify(handlerInput.requestEnvelope)}`);
-    return handlerInput.responseBuilder.getResponse();
-  },
-};
+const skillBuilder = buildSkill();
 
-const ErrorHandler = {
-  canHandle() {
-    return true;
-  },
-  handle(handlerInput, error) {
-    console.error(`Error: ${error.message}`, error);
-    const speech = 'Lo siento, ha ocurrido un error. Inténtalo de nuevo más tarde.';
-    return handlerInput.responseBuilder.speak(speech).reprompt(speech).getResponse();
-  },
-};
-
-exports.handler = Alexa.SkillBuilders.custom()
-  .addRequestHandlers(
-    LaunchRequestHandler,
-    HelloWorldIntentHandler,
-    HelpIntentHandler,
-    CancelAndStopIntentHandler,
-    SessionEndedRequestHandler,
-  )
-  .addErrorHandlers(ErrorHandler)
-  .lambda();
+exports.buildSkill = buildSkill;
+exports.handler = skillBuilder.lambda();
