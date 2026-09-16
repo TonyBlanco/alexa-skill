@@ -1,0 +1,19 @@
+{
+  "name": "alexa-skill-lambda",
+  "version": "1.0.0",
+  "description": "Handler Lambda para la skill de Alexa",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "dependencies": {
+    "ask-sdk-core": "^2.14.0",
+    "ask-sdk-model": "^1.86.0"
+  },
+  "devDependencies": {
+    "ask-sdk-local-debug": "^1.1.0"
+  }
+}

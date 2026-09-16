@@ -1,0 +1,41 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "es-ES": {
+          "summary": "Skill de ejemplo lista para personalizar",
+          "examplePhrases": [
+            "Alexa, abre skill de ejemplo",
+            "Alexa, lanza skill de ejemplo"
+          ],
+          "keywords": [],
+          "name": "Skill de ejemplo",
+          "description": "Plantilla inicial para una custom skill de Alexa con intents básicos."
+        },
+        "en-US": {
+          "summary": "Sample skill ready to customize",
+          "examplePhrases": [
+            "Alexa, open sample skill",
+            "Alexa, launch sample skill"
+          ],
+          "keywords": [],
+          "name": "Sample Skill",
+          "description": "Starter template for an Alexa custom skill with basic intents."
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Di hola tras abrir la skill.",
+      "category": "KNOWLEDGE_AND_TRIVIA",
+      "distributionCountries": []
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:YOUR_AWS_ACCOUNT_ID:function:alexa-skill"
+        },
+        "interfaces": []
+      }
+    },
+    "manifestVersion": "1.0"
+  }
+}
