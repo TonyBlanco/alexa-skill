@@ -3,29 +3,43 @@
     "publishingInformation": {
       "locales": {
         "es-ES": {
-          "summary": "Skill de ejemplo lista para personalizar",
+          "summary": "Compañero de mesilla para personas mayores: check-in, pastillas, compañía y aviso al cuidador.",
           "examplePhrases": [
-            "Alexa, abre skill de ejemplo",
-            "Alexa, lanza skill de ejemplo"
+            "Alexa, abre compañero diario",
+            "Alexa, abre compañero diario y dime que estoy bien",
+            "Alexa, pide a compañero diario que me hable"
           ],
-          "keywords": [],
-          "name": "Skill de ejemplo",
-          "description": "Plantilla inicial para una custom skill de Alexa con intents básicos."
+          "keywords": [
+            "mayores",
+            "cuidador",
+            "pastillas",
+            "soledad",
+            "check-in"
+          ],
+          "name": "Compañero diario",
+          "description": "Acompañante de voz para personas que viven solas o dependen de un familiar. El cuidador configura una vez. El mayor dice frases cortas: estoy bien, pastillas, háblame o emergencia. No es un servicio médico ni llama al 112. Los recordatorios de Alexa, si se conceden, solo invitan a reabrir la skill para confirmar."
         },
         "en-US": {
-          "summary": "Sample skill ready to customize",
+          "summary": "Nightstand companion for older adults: check-ins, pill confirmation, company, caregiver setup.",
           "examplePhrases": [
-            "Alexa, open sample skill",
-            "Alexa, launch sample skill"
+            "Alexa, open daily companion",
+            "Alexa, open daily companion and say I am okay",
+            "Alexa, ask daily companion to talk to me"
           ],
-          "keywords": [],
-          "name": "Sample Skill",
-          "description": "Starter template for an Alexa custom skill with basic intents."
+          "keywords": [
+            "seniors",
+            "caregiver",
+            "pills",
+            "loneliness",
+            "check-in"
+          ],
+          "name": "Daily Companion",
+          "description": "Voice companion for people who live alone or depend on family. A caregiver sets it up once. The older adult uses short phrases: I am okay, pills, talk to me, or emergency. This is not a medical device and does not call emergency services."
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Di hola tras abrir la skill.",
-      "category": "KNOWLEDGE_AND_TRIVIA",
+      "testingInstructions": "1) Abrir la skill: «Alexa, abre compañero diario». 2) Cuidador: «configura», luego un nombre. 3) Mayor: «estoy bien», «pastillas», «me las tomé», «no me acuerdo», «háblame», «emergencia». 4) «pon los recordatorios» pide permiso de voz. Comprobar que emergencia NO promete llamar al 112. 5) HelpIntent debe listar frases, no disparar emergencia.",
+      "category": "HEALTH_AND_FITNESS",
       "distributionCountries": []
     },
     "apis": {
@@ -35,6 +49,18 @@
         },
         "interfaces": []
       }
+    },
+    "permissions": [
+      {
+        "name": "alexa::alerts:reminders:skill:readwrite"
+      }
+    ],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": true,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false
     },
     "manifestVersion": "1.0"
   }
